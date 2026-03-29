@@ -19,35 +19,47 @@ update_local_path() {
 
 update_local_path
 
-# Check for node_modules OR FFmpeg (trigger setup if any missing)
-if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "frontend/node_modules" ] || ! command -v ffmpeg &> /dev/null && [ ! -f "$DIR/bin/ffmpeg" ]; then
-    echo "[INFO] First time setup or missing files detected..."
-    echo
-    chmod +x "$DIR/scripts/setup_mac.sh" &> /dev/null
-    bash "$DIR/scripts/setup_mac.sh"
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] Setup failed. Please check your internet and try again."
-        exit 1
-    fi
-    # Re-check path after setup in case node was just installed
-    update_local_path
+# 1. Setup Environment PATH
+# This ensures we use the portable Node.js if it exists
+if [ -d "$DIR/bin/node/bin" ]; then
+    export PATH="$DIR/bin/node/bin:$PATH"
 fi
 
-# 2. Launching Everything
+# Export local node_modules/.bin paths for sub-process resolution
+export PATH="$DIR/node_modules/.bin:$DIR/backend/node_modules/.bin:$DIR/frontend/node_modules/.bin:$PATH"
+
+# 2. Check for node_modules to see if we need setup
+if [ ! -d "$DIR/node_modules" ] || [ ! -d "$DIR/frontend/node_modules" ] || [ ! -d "$DIR/backend/node_modules" ]; then
+    echo "[INFO] First time setup or missing files detected..."
+    bash "$DIR/scripts/setup_mac.sh"
+    if [ $? -ne 0 ]; then
+        echo "[ERROR] Setup failed. Please check the errors above."
+        exit 1
+    fi
+fi
+
+# 3. Final Verification
 echo "Environment verified successfully! 🚀"
-echo
+echo ""
+
+# 4. Start the Application
 echo "Starting analysis engine and user interface..."
-echo
+echo ""
+
+# Use the absolute path to npm to ensure we use the correct one
+NPM_BIN="npm"
+if [ -f "$DIR/bin/node/bin/npm" ]; then
+    NPM_BIN="$DIR/bin/node/bin/npm"
+fi
 
 # Launch browser in background (wait 5 sec for server)
 echo "Opening browser..."
 (sleep 5 && open http://localhost:5173) &
 
-# Start the system
-npm start
+"$NPM_BIN" start
 
 if [ $? -ne 0 ]; then
-    echo
+    echo ""
     echo "[ERROR] Failed to start Music Analyzer."
     echo "Please ensure Node.js is installed. Try running scripts/setup_mac.sh manually if this persists."
     exit 1

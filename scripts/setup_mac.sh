@@ -23,68 +23,71 @@ if ! command -v node &> /dev/null; then
         echo "We will now download a portable version to run the analyzer automatically..."
         
         # Detect Architecture
-        ARCH=$(uname -m)
-        NODE_VERSION="v20.11.1"
-        DIST_ARCH=""
+        echo "Downloading portable version for macOS..."
         
-        case $ARCH in
-            x86_64) DIST_ARCH="darwin-x64" ;;
-            arm64)  DIST_ARCH="darwin-arm64" ;;
-            *)      echo "[ERROR] Unsupported architecture: $ARCH"; exit 1 ;;
-        esac
-        
-        echo "Downloading Node.js $NODE_VERSION for $DIST_ARCH..."
         mkdir -p "$ROOT_DIR/bin"
-        curl -L -o "$ROOT_DIR/bin/node.tar.gz" "https://nodejs.org/dist/$NODE_VERSION/node-$NODE_VERSION-$DIST_ARCH.tar.gz"
-        
-        if [ $? -ne 0 ]; then
-            echo "[ERROR] Failed to download Node.js. Check your internet."
-            exit 1
+        # Determine architecture
+        ARCH=$(uname -m)
+        NODE_URL="https://nodejs.org/dist/v20.11.1/node-v20.11.1-darwin-x64.tar.gz"
+        if [ "$ARCH" = "arm64" ]; then
+            NODE_URL="https://nodejs.org/dist/v20.11.1/node-v20.11.1-darwin-arm64.tar.gz"
         fi
+
+        curl -L "$NODE_URL" -o "$ROOT_DIR/bin/node.tar.gz"
         
         echo "Extracting Node.js..."
+        # Force cleanup of any partial install
+        rm -rf "$ROOT_DIR/bin/node"
         mkdir -p "$ROOT_DIR/bin/node_tmp"
         tar -xzf "$ROOT_DIR/bin/node.tar.gz" -C "$ROOT_DIR/bin/node_tmp" --strip-components=1
         mv "$ROOT_DIR/bin/node_tmp" "$ROOT_DIR/bin/node"
         rm "$ROOT_DIR/bin/node.tar.gz"
         
         NODE_BINARY="$ROOT_DIR/bin/node/bin/node"
-        echo "[OK] Portable Node.js installed to bin/node"
     fi
-else
-    echo "[OK] Node.js is already installed on the system."
 fi
 
-# Export local node to path for the rest of the script
-export PATH="$ROOT_DIR/bin/node/bin:$PATH"
+# Double check if binary exists now
+if [ ! -f "$NODE_BINARY" ] && [ "$NODE_BINARY" != "node" ]; then
+    echo "[ERROR] Failed to set up portable Node.js"
+    exit 1
+fi
 
-# FFmpeg Section
+echo "[OK] Node.js ready: $NODE_BINARY"
+
+# 2. Check for FFmpeg
+echo "[2/4] Verifying FFmpeg..."
+# Check system PATH first, then project bin folder
+FFMPEG_BINARY="ffmpeg"
 if ! command -v ffmpeg &> /dev/null; then
-    if [ -f "$ROOT_DIR/bin/ffmpeg" ]; then
-        echo "[OK] FFmpeg found in bin/ directory."
+    if [ -f "$ROOT_DIR/bin/ffmpeg/ffmpeg" ]; then
+        FFMPEG_BINARY="$ROOT_DIR/bin/ffmpeg/ffmpeg"
     else
-        echo "FFmpeg not found. We'll download the static binary for the best experience..."
+        echo "FFmpeg not found. Downloading portable version..."
         mkdir -p "$ROOT_DIR/bin"
-        
-        # Download FFmpeg
-        echo "Downloading FFmpeg Static Binary for Mac (this may take a minute)..."
-        curl -L -o "$ROOT_DIR/bin/ffmpeg.zip" https://evermeet.cx/ffmpeg/get/zip
+        # Download static build from evermeet.cx (standard for macOS)
+        curl -L "https://evermeet.cx/ffmpeg/getrelease/zip" -o "$ROOT_DIR/bin/ffmpeg.zip"
+        echo "Extracting FFmpeg..."
         unzip -o "$ROOT_DIR/bin/ffmpeg.zip" -d "$ROOT_DIR/bin/"
         rm "$ROOT_DIR/bin/ffmpeg.zip"
-        
-        # Download FFprobe
-        echo "Downloading FFprobe Static Binary for Mac..."
-        curl -L -o "$ROOT_DIR/bin/ffprobe.zip" https://evermeet.cx/ffprobe/get/zip
-        unzip -o "$ROOT_DIR/bin/ffprobe.zip" -d "$ROOT_DIR/bin/"
-        rm "$ROOT_DIR/bin/ffprobe.zip"
-        
-        chmod +x "$ROOT_DIR/bin/ffmpeg" "$ROOT_DIR/bin/ffprobe"
-        echo "[OK] Portable FFmpeg installed to bin/"
+        # Some zips might extract as a single file, others in a folder. We'll handle both.
+        if [ -f "$ROOT_DIR/bin/ffmpeg" ]; then
+             mkdir -p "$ROOT_DIR/bin/ffmpeg_folder"
+             mv "$ROOT_DIR/bin/ffmpeg" "$ROOT_DIR/bin/ffmpeg_folder/ffmpeg"
+             # Also try to get ffprobe which is in a separate zip usually
+             curl -L "https://evermeet.cx/ffprobe/getrelease/zip" -o "$ROOT_DIR/bin/ffprobe.zip"
+             unzip -o "$ROOT_DIR/bin/ffprobe.zip" -d "$ROOT_DIR/bin/ffmpeg_folder/"
+             rm "$ROOT_DIR/bin/ffprobe.zip"
+             mv "$ROOT_DIR/bin/ffmpeg_folder" "$ROOT_DIR/bin/ffmpeg"
+        fi
+        FFMPEG_BINARY="$ROOT_DIR/bin/ffmpeg/ffmpeg"
     fi
 fi
+echo "[OK] FFmpeg ready."
 
+# 3. Install dependencies
 echo
-echo "[2/4] Installing dependencies... (This may take a few minutes)"
+echo "[3/4] Installing dependencies... (This may take a few minutes)"
 "$NODE_BINARY" -v
 
 # Detect if we should use local npm or system npm
