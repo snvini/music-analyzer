@@ -9,16 +9,28 @@ A high-fidelity, professional-grade audio toolkit designed for DJs to recursivel
 
 This project is designed for **Zero-Configuration**. You don't need to open the terminal or install things manually.
 
-### Windows
+### Windows 🪟
 1.  Download or Clone the repository.
-2.  Double-click **`START_ANALYZER_WINDOWS.bat`**. 🪟
+2.  Double-click **`START_ANALYZER_WINDOWS.bat`**.
 3.  Wait for the first-time setup to complete. The app will open automatically in your browser.
 
-### macOS
+### macOS 🍎
 1.  Download or Clone the repository.
-2.  Double-click **`START_ANALYZER_MAC.command`**. 🍎
-3.  If it asks for permissions, click "Open".
-4.  Wait for the setup. The app will open in your browser.
+2.  Double-click **`START_ANALYZER_MAC.command`**.
+3.  If you see an error about **"Access Privileges"** or **"Permission Denied"**:
+    - Right-click the file and select **Open**. 
+    - OR follow the [Fix Permissions](#-mac-troubleshooting) guide below.
+
+---
+
+## ⚠️ Mac Troubleshooting
+If macOS says the file "could not be executed because you do not have appropriate access privileges", follow these 10-second steps:
+
+1.  Open your **Terminal** (press `Command + Space` and search for "Terminal").
+2.  Type exactly this: `chmod +x ` (**Note: leave a space after the +x**).
+3.  **Drag and Drop** the file `START_ANALYZER_MAC.command` into the terminal window.
+4.  Press **Enter**. 
+5.  Now you can double-click the file normally! 🎉
 
 ---
 
