@@ -48,12 +48,13 @@ echo [OK] FFmpeg detected.
 goto :ffmpeg_ready
 
 :check_local_ffmpeg
-if exist "bin\ffmpeg.exe" goto :local_ffmpeg_found
+if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
+if exist "%ROOT_DIR%\bin\ffmpeg.exe" goto :local_ffmpeg_found
 echo FFmpeg not found. Downloading portable version...
-powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'bin\ffmpeg.zip'"
+powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
 
 echo Extracting FFmpeg...
-powershell -Command "Expand-Archive -Path 'bin\ffmpeg.zip' -DestinationPath 'bin\ffmpeg_tmp'; Get-ChildItem -Path 'bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination 'bin\'; Remove-Item 'bin\ffmpeg_tmp' -Recurse; Remove-Item 'bin\ffmpeg.zip'"
+powershell -Command "Expand-Archive -Path '%ROOT_DIR%\bin\ffmpeg.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg_tmp'; Get-ChildItem -Path '%ROOT_DIR%\bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination '%ROOT_DIR%\bin\'; Remove-Item '%ROOT_DIR%\bin\ffmpeg_tmp' -Recurse; Remove-Item '%ROOT_DIR%\bin\ffmpeg.zip'"
 goto :local_ffmpeg_found
 
 :local_ffmpeg_found
