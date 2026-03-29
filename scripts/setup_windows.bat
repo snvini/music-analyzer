@@ -20,7 +20,7 @@ echo [OK] Node.js is already installed on the system.
 goto :node_ready
 
 :check_local_node
-if exist "bin\node\node.exe" goto :local_node_found
+if exist "bin\node_v22\node.exe" goto :local_node_found
 echo [INFO] Node.js not found in system.
 echo We will now download a portable version to run the analyzer automatically...
 
@@ -29,10 +29,10 @@ if %errorlevel% neq 0 goto :download_error
 
 echo Extracting Node.js...
 :: Clean up any partial install
-if exist "bin\node" rmdir /s /q "bin\node"
-powershell -Command "Expand-Archive -Path 'bin\node.zip' -DestinationPath 'bin\node_tmp'; $folder = Get-ChildItem 'bin\node_tmp' | Select-Object -First 1; Move-Item \"$($folder.FullName)\" 'bin\node'; Remove-Item 'bin\node_tmp' -Recurse -Force; Remove-Item 'bin\node.zip' -Force"
+if exist "bin\node_v22" rmdir /s /q "bin\node_v22"
+powershell -Command "Expand-Archive -Path 'bin\node.zip' -DestinationPath 'bin\node_tmp'; $folder = Get-ChildItem 'bin\node_tmp' | Select-Object -First 1; Move-Item \"$($folder.FullName)\" 'bin\node_v22'; Remove-Item 'bin\node_tmp' -Recurse -Force; Remove-Item 'bin\node.zip' -Force"
 
-if not exist "bin\node\node.exe" (
+if not exist "bin\node_v22\node.exe" (
     echo [ERROR] Logic failure during Node.js extraction.
     pause
     exit /b 1

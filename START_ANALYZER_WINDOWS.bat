@@ -11,15 +11,15 @@ echo.
 
 :: 1. Verification of Environment
 :: Detect Node location without using fragile IF blocks
-if exist "bin\node\node.exe" goto :use_local_node
+if exist "bin\node_v22\node.exe" goto :use_local_node
 node -v >nul 2>&1
 if %errorlevel% neq 0 goto :setup
 set "NPM_CMD=npm"
 goto :check_modules
 
 :use_local_node
-set "PATH=%CD%\bin\node;%PATH%"
-set "NPM_CMD=%CD%\bin\node\npm.cmd"
+set "PATH=%CD%\bin\node_v22;%PATH%"
+set "NPM_CMD=%CD%\bin\node_v22\npm.cmd"
 goto :check_modules
 
 :check_modules
