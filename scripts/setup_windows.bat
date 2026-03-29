@@ -55,7 +55,7 @@ goto :ffmpeg_ready
 if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
 if exist "%ROOT_DIR%\bin\ffmpeg.exe" goto :local_ffmpeg_found
 echo FFmpeg not found. Downloading portable version...
-powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -UseBasicParsing -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
+powershell -Command "Write-Host 'Downloading FFmpeg via GitHub (Turbo Link)...'; Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
 
 echo Extracting FFmpeg...
 :: Clean up any partial install
