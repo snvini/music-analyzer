@@ -32,23 +32,40 @@ const COMMON_FFPROBE_PATHS = [
     '/usr/bin/ffprobe'
 ];
 
-// Function to verify if FFmpeg is working and find its location
+// Function to verify if FFmpeg/FFprobe are working and find their locations
 async function findAndVerifyFFmpeg() {
+    let ffmpegValid = false;
+    let ffprobeValid = false;
+
+    // Verify FFmpeg
     for (const p of COMMON_FFMPEG_PATHS) {
-        const works = await new Promise((resolve) => {
+        ffmpegValid = await new Promise((resolve) => {
             const proc = spawn(p, ['-version']);
             proc.on('error', () => resolve(false));
             proc.on('close', (code) => resolve(code === 0));
         });
-        if (works) {
+        if (ffmpegValid) {
             FFMPEG_PATH = p;
-            // Also update ffprobe path if it matches the same prefix
-            const probePath = p.replace('ffmpeg', 'ffprobe');
-            if (fs.existsSync(probePath)) FFPROBE_PATH = probePath;
-            return true;
+            console.log(`[OK] FFmpeg found at: ${p}`);
+            break;
         }
     }
-    return false;
+
+    // Verify FFprobe
+    for (const p of COMMON_FFPROBE_PATHS) {
+        ffprobeValid = await new Promise((resolve) => {
+            const proc = spawn(p, ['-version']);
+            proc.on('error', () => resolve(false));
+            proc.on('close', (code) => resolve(code === 0));
+        });
+        if (ffprobeValid) {
+            FFPROBE_PATH = p;
+            console.log(`[OK] FFprobe found at: ${p}`);
+            break;
+        }
+    }
+
+    return ffmpegValid && ffprobeValid;
 }
 
 // Helper to recursively find audio files
@@ -83,19 +100,29 @@ function getAudioInfo(filePath) {
         ]);
 
         let output = '';
+        let errorOutput = '';
         proc.stdout.on('data', (data) => output += data.toString());
+        proc.stderr.on('data', (data) => errorOutput += data.toString());
         
-        proc.on('close', () => {
+        proc.on('close', (code) => {
+            if (code !== 0) {
+              console.error(`[ERROR] FFprobe failed for: ${filePath}`, errorOutput);
+              return resolve({ codec: 'ERROR', sampleRate: '?k', bitrate: 'error' });
+            }
+
             const lines = output.trim().split('\n');
             const br = parseInt(lines[2]);
             resolve({
-                codec: lines[0] || 'unknown',
-                sampleRate: lines[1] || 'unknown',
+                codec: (lines[0] || 'Unknown').toUpperCase(),
+                sampleRate: lines[1] ? (parseInt(lines[1])/1000).toFixed(1) + 'k' : 'Unknown',
                 bitrate: !isNaN(br) ? Math.round(br/1000) + ' kbps' : ((lines[0] || '').includes('flac') || (lines[0] || '').includes('pcm') ? 'Lossless' : 'N/A')
             });
         });
         
-        proc.on('error', () => resolve({ codec: 'error', sampleRate: 'error', bitrate: 'error' }));
+        proc.on('error', (err) => {
+          console.error(`[CRITICAL] Could not launch FFprobe at ${FFPROBE_PATH}:`, err.message);
+          resolve({ codec: 'LAUNCH_ERROR', sampleRate: '?', bitrate: 'error' });
+        });
     });
 }
 
@@ -155,8 +182,11 @@ app.get('/api/browse', async (req, res) => {
     let currentPath = req.query.path || os.homedir();
     
     try {
-        // If empty path, default to home
+        // Handle empty path
         if (!currentPath) currentPath = os.homedir();
+
+        // Resolve tilde home paths
+        if (currentPath === '~') currentPath = os.homedir();
 
         const entries = fs.readdirSync(currentPath, { withFileTypes: true });
         const folders = entries
@@ -173,6 +203,35 @@ app.get('/api/browse', async (req, res) => {
         console.error("Browse Error:", err);
         res.status(500).json({ error: "Could not read directory." });
     }
+});
+
+// Endpoint to get system root shortcuts
+app.get('/api/roots', (req, res) => {
+    const roots = [
+        { label: 'Home', path: os.homedir(), icon: 'home' },
+        { label: 'Desktop', path: path.join(os.homedir(), 'Desktop'), icon: 'monitor' },
+        { label: 'Documents', path: path.join(os.homedir(), 'Documents'), icon: 'file' }
+    ];
+
+    if (os.platform() === 'darwin') {
+        roots.push({ label: 'External SSDs', path: '/Volumes', icon: 'hard-drive' });
+    } else if (os.platform() === 'win32') {
+        try {
+            const { execSync } = require('child_process');
+            const driveOutput = execSync('wmic logicaldisk get name').toString();
+            const drives = driveOutput.split('\r\n')
+                .filter(line => /[A-Z]:/.test(line))
+                .map(line => line.trim());
+            
+            drives.forEach(drive => {
+                roots.push({ label: `Drive (${drive})`, path: `${drive}\\`, icon: 'hard-drive' });
+            });
+        } catch (e) {
+            roots.push({ label: 'System Drive (C:)', path: 'C:\\', icon: 'hard-drive' });
+        }
+    }
+    
+    res.json(roots);
 });
 
 // Event stream endpoint
