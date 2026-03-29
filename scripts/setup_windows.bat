@@ -24,7 +24,7 @@ if exist "bin\node\node.exe" goto :local_node_found
 echo [INFO] Node.js not found in system.
 echo We will now download a portable version to run the analyzer automatically...
 
-powershell -Command "Write-Host 'Downloading Node.js v20 LTS...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -Uri 'https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip' -OutFile 'bin\node.zip'"
+powershell -Command "Write-Host 'Downloading Node.js v20 LTS...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -UseBasicParsing -Uri 'https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip' -OutFile 'bin\node.zip'"
 if %errorlevel% neq 0 goto :download_error
 
 echo Extracting Node.js...
@@ -51,7 +51,7 @@ goto :ffmpeg_ready
 if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
 if exist "%ROOT_DIR%\bin\ffmpeg.exe" goto :local_ffmpeg_found
 echo FFmpeg not found. Downloading portable version...
-powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
+powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -UseBasicParsing -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
 
 echo Extracting FFmpeg...
 powershell -Command "Expand-Archive -Path '%ROOT_DIR%\bin\ffmpeg.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg_tmp'; Get-ChildItem -Path '%ROOT_DIR%\bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination '%ROOT_DIR%\bin\'; Remove-Item '%ROOT_DIR%\bin\ffmpeg_tmp' -Recurse; Remove-Item '%ROOT_DIR%\bin\ffmpeg.zip'"
