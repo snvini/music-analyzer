@@ -43,20 +43,25 @@ echo "Environment verified successfully! 🚀"
 echo ""
 
 # 4. Start the Application
-echo "Starting analysis engine and user interface..."
+echo "Starting analysis engine..."
 echo ""
 
-# Use the absolute path to npm to ensure we use the correct one
+# Ensure we use portable npm if available
 NPM_BIN="npm"
-if [ -f "$DIR/bin/node/bin/npm" ]; then
-    NPM_BIN="$DIR/bin/node/bin/npm"
+if [ -f "$DIR/bin/node_v22/bin/npm" ]; then
+    NPM_BIN="$DIR/bin/node_v22/bin/npm"
 fi
 
 # Launch browser in background (wait 5 sec for server)
 echo "Opening browser..."
 (sleep 5 && open http://localhost:5173) &
 
-"$NPM_BIN" start
+# Run start command with absolute node if portable
+if [ -f "$DIR/bin/node_v22/bin/node" ]; then
+    "$DIR/bin/node_v22/bin/node" "$NPM_BIN" start
+else
+    "$NPM_BIN" start
+fi
 
 if [ $? -ne 0 ]; then
     echo ""

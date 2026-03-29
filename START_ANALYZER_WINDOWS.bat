@@ -57,14 +57,11 @@ exit /b 1
 :launch
 echo [OK] Environment ready! 🚀
 echo.
-echo Starting analysis engine and user interface...
+echo Starting analysis engine...
 echo.
 
-:: Launch browser in background (wait 5 sec for server)
-start /b cmd /c "timeout /t 5 >nul && start http://localhost:5173"
-
-:: Start the system using the detected NPM command
-call %NPM_CMD% start
+:: Start the system using the detected NPM command (Quoted for paths with spaces)
+call "%NPM_CMD%" start
 
 if %errorlevel% neq 0 (
     echo.

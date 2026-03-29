@@ -6,8 +6,8 @@
   "scripts": {
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "start": "concurrently -n \"BACKEND,FRONTEND\" -c \"magenta,cyan\" \"npm run start:backend\" \"npm run start:frontend\"",
-    "start:backend": "cd backend && node server.js",
-    "start:frontend": "cd frontend && npm run dev",
+    "start:backend": "node backend/server.js",
+    "start:frontend": "npm run dev --prefix frontend -- --open",
     "setup": "node scripts/setup-check.js"
   },
   "devDependencies": {
