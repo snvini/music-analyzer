@@ -28,8 +28,15 @@ powershell -Command "Write-Host 'Downloading Node.js v20 LTS...'; New-Item -Item
 if %errorlevel% neq 0 goto :download_error
 
 echo Extracting Node.js...
-powershell -Command "Expand-Archive -Path 'bin\node.zip' -DestinationPath 'bin\node_tmp'; $folder = Get-ChildItem 'bin\node_tmp' | Select-Object -First 1; Move-Item \"$($folder.FullName)\*\" 'bin\node'; Remove-Item 'bin\node_tmp' -Recurse; Remove-Item 'bin\node.zip'"
-goto :local_node_found
+:: Clean up any partial install
+if exist "bin\node" rmdir /s /q "bin\node"
+powershell -Command "Expand-Archive -Path 'bin\node.zip' -DestinationPath 'bin\node_tmp'; $folder = Get-ChildItem 'bin\node_tmp' | Select-Object -First 1; Move-Item \"$($folder.FullName)\" 'bin\node'; Remove-Item 'bin\node_tmp' -Recurse -Force; Remove-Item 'bin\node.zip' -Force"
+
+if not exist "bin\node\node.exe" (
+    echo [ERROR] Logic failure during Node.js extraction.
+    pause
+    exit /b 1
+)
 
 :local_node_found
 set "NODE_BINARY=%ROOT_DIR%\bin\node\node.exe"
@@ -51,7 +58,15 @@ echo FFmpeg not found. Downloading portable version...
 powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -UseBasicParsing -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
 
 echo Extracting FFmpeg...
-powershell -Command "Expand-Archive -Path '%ROOT_DIR%\bin\ffmpeg.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg_tmp'; Get-ChildItem -Path '%ROOT_DIR%\bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination '%ROOT_DIR%\bin\'; Remove-Item '%ROOT_DIR%\bin\ffmpeg_tmp' -Recurse; Remove-Item '%ROOT_DIR%\bin\ffmpeg.zip'"
+:: Clean up any partial install
+if exist "%ROOT_DIR%\bin\ffmpeg_tmp" rmdir /s /q "%ROOT_DIR%\bin\ffmpeg_tmp"
+powershell -Command "Expand-Archive -Path '%ROOT_DIR%\bin\ffmpeg.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg_tmp'; Get-ChildItem -Path '%ROOT_DIR%\bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination '%ROOT_DIR%\bin\'; Remove-Item '%ROOT_DIR%\bin\ffmpeg_tmp' -Recurse -Force; Remove-Item '%ROOT_DIR%\bin\ffmpeg.zip' -Force"
+
+if not exist "%ROOT_DIR%\bin\ffmpeg.exe" (
+    echo [ERROR] Logic failure during FFmpeg extraction.
+    pause
+    exit /b 1
+)
 goto :local_ffmpeg_found
 
 :local_ffmpeg_found
