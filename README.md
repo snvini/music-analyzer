@@ -49,6 +49,3 @@ Built out of personal necessity for library security. Being **Open Source** mean
 
 ## 🤝 Support & Credit
 Built with **Love for DJing** by **[DJ Viniish](https://www.instagram.com/viniishdj/)**.
-
----
-*For the Art of DJing.*
