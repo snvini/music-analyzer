@@ -24,7 +24,7 @@ if exist "bin\node\node.exe" goto :local_node_found
 echo [INFO] Node.js not found in system.
 echo We will now download a portable version to run the analyzer automatically...
 
-powershell -Command "Write-Host 'Downloading Node.js v20 LTS...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -UseBasicParsing -Uri 'https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip' -OutFile 'bin\node.zip'"
+powershell -Command "Write-Host 'Downloading Node.js v22 LTS (Required for Vite 6)...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -UseBasicParsing -Uri 'https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip' -OutFile 'bin\node.zip'"
 if %errorlevel% neq 0 goto :download_error
 
 echo Extracting Node.js...

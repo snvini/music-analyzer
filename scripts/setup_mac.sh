@@ -28,9 +28,9 @@ if ! command -v node &> /dev/null; then
         mkdir -p "$ROOT_DIR/bin"
         # Determine architecture
         ARCH=$(uname -m)
-        NODE_URL="https://nodejs.org/dist/v20.11.1/node-v20.11.1-darwin-x64.tar.gz"
+        NODE_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-x64.tar.gz"
         if [ "$ARCH" = "arm64" ]; then
-            NODE_URL="https://nodejs.org/dist/v20.11.1/node-v20.11.1-darwin-arm64.tar.gz"
+            NODE_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-arm64.tar.gz"
         fi
 
         curl -L "$NODE_URL" -o "$ROOT_DIR/bin/node.tar.gz"
