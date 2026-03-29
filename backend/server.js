@@ -12,6 +12,8 @@ app.use(express.json());
 // Configure FFMPEG paths. 
 // For OSS users, it defaults to system PATH.
 // We use 'ffmpeg' and 'ffprobe' which should be in the PATH if installed.
+let FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg";
+let FFPROBE_PATH = process.env.FFPROBE_PATH || "ffprobe";
 const isWin = os.platform() === 'win32';
 const ext = isWin ? '.exe' : '';
 
