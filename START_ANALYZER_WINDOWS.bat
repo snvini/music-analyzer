@@ -11,32 +11,31 @@ echo.
 
 :: 1. Verification of Environment
 :: Add local node to PATH if it exists
-if exist "bin\node" (
-    set "PATH=%cd%\bin\node;%PATH%"
-)
+if exist "bin\node" set "PATH=%cd%\bin\node;%PATH%"
 
-if not exist "node_modules" (
-    goto :setup
-)
-if not exist "backend\node_modules" (
-    goto :setup
-)
-if not exist "frontend\node_modules" (
-    goto :setup
-)
+if not exist "node_modules" goto :setup
+if not exist "backend\node_modules" goto :setup
+if not exist "frontend\node_modules" goto :setup
 goto :launch
 
 :setup
 echo [INFO] First time setup or missing files detected...
 echo.
+if exist "scripts\setup_windows.bat" goto :run_setup
+echo [ERROR] Critical file missing: scripts\setup_windows.bat
+pause
+exit /b 1
+
+:run_setup
 call scripts\setup_windows.bat
-if %errorlevel% neq 0 (
-    echo.
-    echo [ERROR] Setup failed. Please check your internet and try again.
-    pause
-    exit /b 1
-)
+if %errorlevel% neq 0 goto :setup_error
 goto :launch
+
+:setup_error
+echo.
+echo [ERROR] Setup failed. Please check your internet and try again.
+pause
+exit /b 1
 
 :launch
 echo [OK] Environment ready! 🚀

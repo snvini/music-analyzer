@@ -15,53 +15,52 @@ echo.
 echo [1/4] Verifying Node.js installation...
 set "NODE_BINARY=node"
 node -v >nul 2>&1
-if %errorlevel% neq 0 (
-    if exist "bin\node\node.exe" (
-        set "NODE_BINARY=%ROOT_DIR%\bin\node\node.exe"
-        echo [OK] Portable Node.js found locally.
-    ) else (
-        echo [INFO] Node.js not found in system.
-        echo We will now download a portable version to run the analyzer automatically...
-        
-        powershell -Command "Write-Host 'Downloading Node.js v20 LTS...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -Uri 'https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip' -OutFile 'bin\node.zip'"
-        
-        if %errorlevel% neq 0 (
-            echo [ERROR] Failed to download Node.js. Check your internet.
-            pause
-            exit /b 1
-        )
-        
-        echo Extracting Node.js...
-        powershell -Command "Expand-Archive -Path 'bin\node.zip' -DestinationPath 'bin\node_tmp'; $folder = Get-ChildItem 'bin\node_tmp' | Select-Object -First 1; Move-Item \"$($folder.FullName)\*\" 'bin\node'; Remove-Item 'bin\node_tmp' -Recurse; Remove-Item 'bin\node.zip'"
-        
-        set "NODE_BINARY=%ROOT_DIR%\bin\node\node.exe"
-        echo [OK] Portable Node.js installed to bin\node
-    )
-) else (
-    echo [OK] Node.js is already installed on the system.
-)
+if %errorlevel% neq 0 goto :check_local_node
+echo [OK] Node.js is already installed on the system.
+goto :node_ready
 
-:: Update PATH for the current session to include portable node/npm
+:check_local_node
+if exist "bin\node\node.exe" goto :local_node_found
+echo [INFO] Node.js not found in system.
+echo We will now download a portable version to run the analyzer automatically...
+
+powershell -Command "Write-Host 'Downloading Node.js v20 LTS...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -Uri 'https://nodejs.org/dist/v20.11.1/node-v20.11.1-win-x64.zip' -OutFile 'bin\node.zip'"
+if %errorlevel% neq 0 goto :download_error
+
+echo Extracting Node.js...
+powershell -Command "Expand-Archive -Path 'bin\node.zip' -DestinationPath 'bin\node_tmp'; $folder = Get-ChildItem 'bin\node_tmp' | Select-Object -First 1; Move-Item \"$($folder.FullName)\*\" 'bin\node'; Remove-Item 'bin\node_tmp' -Recurse; Remove-Item 'bin\node.zip'"
+goto :local_node_found
+
+:local_node_found
+set "NODE_BINARY=%ROOT_DIR%\bin\node\node.exe"
+echo [OK] Portable Node.js found locally.
+goto :node_ready
+
+:node_ready
+:: Update PATH for session
 set "PATH=%ROOT_DIR%\bin\node;%PATH%"
 
 :: 2. Check for FFmpeg
 echo [2/4] Verifying FFmpeg (Required for audio analysis)...
 ffmpeg -version >nul 2>&1
-if %errorlevel% neq 0 (
-    if exist "bin\ffmpeg.exe" (
-        echo [OK] FFmpeg found in bin\ directory.
-    ) else (
-        echo FFmpeg not found. Downloading portable version...
-        powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'bin\ffmpeg.zip'"
-        
-        echo Extracting FFmpeg...
-        powershell -Command "Expand-Archive -Path 'bin\ffmpeg.zip' -DestinationPath 'bin\ffmpeg_tmp'; Get-ChildItem -Path 'bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination 'bin\'; Remove-Item 'bin\ffmpeg_tmp' -Recurse; Remove-Item 'bin\ffmpeg.zip'"
-        
-        echo [OK] Portable FFmpeg installed to bin\
-    )
-) else (
-    echo [OK] FFmpeg detected.
-)
+if %errorlevel% neq 0 goto :check_local_ffmpeg
+echo [OK] FFmpeg detected.
+goto :ffmpeg_ready
+
+:check_local_ffmpeg
+if exist "bin\ffmpeg.exe" goto :local_ffmpeg_found
+echo FFmpeg not found. Downloading portable version...
+powershell -Command "Write-Host 'Downloading FFmpeg...'; Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile 'bin\ffmpeg.zip'"
+
+echo Extracting FFmpeg...
+powershell -Command "Expand-Archive -Path 'bin\ffmpeg.zip' -DestinationPath 'bin\ffmpeg_tmp'; Get-ChildItem -Path 'bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination 'bin\'; Remove-Item 'bin\ffmpeg_tmp' -Recurse; Remove-Item 'bin\ffmpeg.zip'"
+goto :local_ffmpeg_found
+
+:local_ffmpeg_found
+echo [OK] Portable FFmpeg installed to bin\
+goto :ffmpeg_ready
+
+:ffmpeg_ready
 echo.
 
 :: 3. Install dependencies
@@ -95,6 +94,13 @@ echo to start the system automatically.
 echo.
 timeout /t 5
 exit /b 0
+
+:download_error
+echo.
+echo [ERROR] Failed to download from Node.js or FFmpeg server. 
+echo Please check your internet connection.
+pause
+exit /b 1
 
 :error
 echo.
