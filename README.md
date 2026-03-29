@@ -19,7 +19,7 @@ This project is designed for **Zero-Configuration**. You don't need to open the 
 
 ### Windows 🪟
 1.  Download or Clone the repository.
-2.  Double-click **`START_ANALYZER_WINDOWS.bat`**.
+2.  Double-click **`START_ANALYZER_WINDOWS.bat`** (**Executar como Administrador** / **Run as Administrator**).
 3.  Wait for the first-time setup to complete. The app will open automatically in your browser.
 
 ### macOS 🍎

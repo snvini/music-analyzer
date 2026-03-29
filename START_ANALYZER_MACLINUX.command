@@ -10,6 +10,11 @@ echo "============================================================"
 echo
 
 # 1. Verification of Environment
+# Add local node to PATH if it exists
+if [ -d "$DIR/bin/node/bin" ]; then
+    export PATH="$DIR/bin/node/bin:$PATH"
+fi
+
 if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "frontend/node_modules" ]; then
     echo "[INFO] First time setup or missing files detected..."
     echo
