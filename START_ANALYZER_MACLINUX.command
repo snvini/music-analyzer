@@ -19,24 +19,31 @@ update_local_path() {
 
 update_local_path
 
-# 1. Setup Environment PATH
-# This ensures we use the portable Node.js if it exists
-if [ -d "$DIR/bin/node/bin" ]; then
-    export PATH="$DIR/bin/node/bin:$PATH"
-fi
-
-# Export local node_modules/.bin paths for sub-process resolution
-export PATH="$DIR/node_modules/.bin:$DIR/backend/node_modules/.bin:$DIR/frontend/node_modules/.bin:$PATH"
-
-# 2. Check for node_modules to see if we need setup
-if [ ! -d "$DIR/node_modules" ] || [ ! -d "$DIR/frontend/node_modules" ] || [ ! -d "$DIR/backend/node_modules" ]; then
-    echo "[INFO] First time setup or missing files detected..."
-    bash "$DIR/scripts/setup_mac.sh"
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] Setup failed. Please check the errors above."
-        exit 1
+verify_and_start() {
+    # 1. Setup Environment PATH
+    # This ensures we use the portable Node.js if it exists and sub-processes can find tools
+    if [ -d "$DIR/bin/node_v22/bin" ]; then
+        export PATH="$DIR/bin/node_v22/bin:$PATH"
     fi
-fi
+
+    # Export local node_modules/.bin paths for sub-process resolution
+    export PATH="$DIR/node_modules/.bin:$DIR/backend/node_modules/.bin:$DIR/frontend/node_modules/.bin:$PATH"
+
+    # 2. Check for node_modules to see if we need setup
+    if [ ! -d "$DIR/node_modules" ] || [ ! -d "$DIR/frontend/node_modules" ] || [ ! -d "$DIR/backend/node_modules" ]; then
+        echo "[INFO] First time setup or missing files detected..."
+        bash "$DIR/scripts/setup_mac.sh"
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] Setup failed. Please check the errors above."
+            exit 1
+        fi
+        # Re-verify after setup
+        verify_and_start
+        return
+    fi
+}
+
+verify_and_start
 
 # 3. Final Verification
 echo "Environment verified successfully! 🚀"

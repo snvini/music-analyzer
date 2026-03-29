@@ -33,7 +33,7 @@ if ! command -v node &> /dev/null; then
             NODE_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-arm64.tar.gz"
         fi
 
-        curl -L "$NODE_URL" -o "$ROOT_DIR/bin/node.tar.gz"
+        curl -L --progress-bar "$NODE_URL" -o "$ROOT_DIR/bin/node.tar.gz"
         
         echo "Extracting Node.js..."
         # Force cleanup of any partial install
@@ -66,7 +66,7 @@ if ! command -v ffmpeg &> /dev/null; then
         echo "FFmpeg not found. Downloading portable version..."
         mkdir -p "$ROOT_DIR/bin"
         # Download static build from evermeet.cx (standard for macOS)
-        curl -L "https://evermeet.cx/ffmpeg/getrelease/zip" -o "$ROOT_DIR/bin/ffmpeg.zip"
+        curl -L --progress-bar "https://evermeet.cx/ffmpeg/getrelease/zip" -o "$ROOT_DIR/bin/ffmpeg.zip"
         echo "Extracting FFmpeg..."
         unzip -o "$ROOT_DIR/bin/ffmpeg.zip" -d "$ROOT_DIR/bin/"
         rm "$ROOT_DIR/bin/ffmpeg.zip"

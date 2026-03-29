@@ -9,6 +9,7 @@ echo   MUSIC ANALYZER - UNIFIED STARTUP
 echo ============================================================
 echo.
 
+:start_detection
 :: 1. Verification of Environment
 :: Detect Node location without using fragile IF blocks
 if exist "bin\node_v22\node.exe" goto :use_local_node
@@ -46,7 +47,7 @@ exit /b 1
 :run_setup
 call scripts\setup_windows.bat
 if %errorlevel% neq 0 goto :setup_error
-goto :launch
+goto :start_detection
 
 :setup_error
 echo.

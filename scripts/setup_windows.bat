@@ -21,11 +21,15 @@ goto :node_ready
 
 :check_local_node
 if exist "bin\node_v22\node.exe" goto :local_node_found
-echo [INFO] Node.js not found in system.
+echo [INFO] Node.js not found or outdated in system.
 echo We will now download a portable version to run the analyzer automatically...
 
-powershell -Command "Write-Host 'Downloading Node.js v22 LTS (Required for Vite 6)...'; New-Item -ItemType Directory -Force -Path 'bin'; Invoke-WebRequest -UseBasicParsing -Uri 'https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip' -OutFile 'bin\node.zip'"
-if %errorlevel% neq 0 goto :download_error
+curl -L --progress-bar "https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip" -o "bin\node.zip"
+if %errorlevel% neq 0 (
+    echo [ERROR] Download failed. Check your connection.
+    pause
+    exit /b 1
+)
 
 echo Extracting Node.js...
 :: Clean up any partial install
@@ -54,8 +58,13 @@ goto :ffmpeg_ready
 :check_local_ffmpeg
 if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
 if exist "%ROOT_DIR%\bin\ffmpeg.exe" goto :local_ffmpeg_found
-echo FFmpeg not found. Downloading portable version...
-powershell -Command "Write-Host 'Downloading FFmpeg via GitHub (Turbo Link)...'; Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip' -OutFile '%ROOT_DIR%\bin\ffmpeg.zip'"
+echo FFmpeg not found. Downloading portable version (This may take a moment)...
+curl -L --progress-bar "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -o "%ROOT_DIR%\bin\ffmpeg.zip"
+if %errorlevel% neq 0 (
+    echo [ERROR] FFmpeg download failed.
+    pause
+    exit /b 1
+)
 
 echo Extracting FFmpeg...
 :: Clean up any partial install
