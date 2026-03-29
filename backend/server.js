@@ -12,16 +12,41 @@ app.use(express.json());
 // Configure FFMPEG paths. 
 // For OSS users, it defaults to system PATH.
 // We use 'ffmpeg' and 'ffprobe' which should be in the PATH if installed.
-const FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg";
-const FFPROBE_PATH = process.env.FFPROBE_PATH || "ffprobe";
+let FFMPEG_PATH = process.env.FFMPEG_PATH || "ffmpeg";
+let FFPROBE_PATH = process.env.FFPROBE_PATH || "ffprobe";
 
-// Function to verify if FFmpeg is working
-function verifyFFmpeg() {
-    return new Promise((resolve) => {
-        const proc = spawn(FFMPEG_PATH, ['-version']);
-        proc.on('error', () => resolve(false));
-        proc.on('close', (code) => resolve(code === 0));
-    });
+// Common paths for Mac/Linux to be extra safe
+const COMMON_FFMPEG_PATHS = [
+    FFMPEG_PATH,
+    '/usr/local/bin/ffmpeg',
+    '/opt/homebrew/bin/ffmpeg',
+    '/usr/bin/ffmpeg'
+];
+
+const COMMON_FFPROBE_PATHS = [
+    FFPROBE_PATH,
+    '/usr/local/bin/ffprobe',
+    '/opt/homebrew/bin/ffprobe',
+    '/usr/bin/ffprobe'
+];
+
+// Function to verify if FFmpeg is working and find its location
+async function findAndVerifyFFmpeg() {
+    for (const p of COMMON_FFMPEG_PATHS) {
+        const works = await new Promise((resolve) => {
+            const proc = spawn(p, ['-version']);
+            proc.on('error', () => resolve(false));
+            proc.on('close', (code) => resolve(code === 0));
+        });
+        if (works) {
+            FFMPEG_PATH = p;
+            // Also update ffprobe path if it matches the same prefix
+            const probePath = p.replace('ffmpeg', 'ffprobe');
+            if (fs.existsSync(probePath)) FFPROBE_PATH = probePath;
+            return true;
+        }
+    }
+    return false;
 }
 
 // Helper to recursively find audio files
@@ -113,7 +138,7 @@ function analyzeQuality(filePath) {
 
 // Health check endpoint for system readiness
 app.get('/api/health', async (req, res) => {
-  const ffmpegOk = await verifyFFmpeg();
+  const ffmpegOk = await findAndVerifyFFmpeg();
   res.json({
     status: 'ok',
     ffmpeg: ffmpegOk,

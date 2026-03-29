@@ -9,6 +9,7 @@ interface SystemCheckProps {
 
 export const SystemCheck: React.FC<SystemCheckProps> = ({ serverStatus, ffmpegStatus, onRetry }) => {
   const isServerDown = serverStatus === 'error';
+  const isMac = typeof window !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(window.navigator.platform);
 
   if (serverStatus === 'checking') {
     return (
@@ -33,7 +34,7 @@ export const SystemCheck: React.FC<SystemCheckProps> = ({ serverStatus, ffmpegSt
         
         <p style={{ marginBottom: '2rem', color: '#fca5a5' }}>
           {isServerDown 
-            ? 'The analysis engine (Backend) is not responding. Please ensure you started the system via Launch_Music_Analyzer.bat.' 
+            ? `The analysis engine (Backend) is not responding. Please ensure you started the system via ${isMac ? './launch_mac.sh' : 'launch_windows.bat'}.` 
             : 'The analysis engine is running, but FFmpeg was not found on your system. It is essential for analyzing music frequencies.'}
         </p>
 
@@ -44,16 +45,16 @@ export const SystemCheck: React.FC<SystemCheckProps> = ({ serverStatus, ffmpegSt
           <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', fontSize: '0.85rem', color: '#d4d4d4' }}>
             {isServerDown ? (
               <>
-                <li>Close all black terminal windows.</li>
-                <li>Double-click <code>setup_windows.bat</code> to ensure everything is installed.</li>
-                <li>Use <code>launch_windows.bat</code> to start again.</li>
+                <li>{isMac ? 'Close the Terminal app.' : 'Close all black terminal windows.'}</li>
+                <li>Run <code>{isMac ? './setup_mac.sh' : 'setup_windows.bat'}</code> to ensure everything is installed.</li>
+                <li>Use <code>{isMac ? './launch_mac.sh' : 'launch_windows.bat'}</code> to start again.</li>
               </>
             ) : (
               <>
-                <li>Open a terminal (PowerShell or CMD).</li>
-                <li>Paste children command: <code>winget install Gyan.FFmpeg</code></li>
+                <li>Open a terminal ({isMac ? 'Terminal.app' : 'PowerShell or CMD'}).</li>
+                <li>Paste {isMac ? 'this brew' : 'children'} command: <code>{isMac ? 'brew install ffmpeg' : 'winget install Gyan.FFmpeg'}</code></li>
                 <li>Or download manually at <a href="https://ffmpeg.org/" target="_blank" rel="noreferrer" style={{ color: 'var(--accent-cyan)' }}>ffmpeg.org</a>.</li>
-                <li>After installation, restart the system.</li>
+                <li>After installation, <b>restart the terminal</b> and the system.</li>
               </>
             )}
           </ul>
