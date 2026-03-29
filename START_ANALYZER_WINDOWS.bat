@@ -16,6 +16,13 @@ if exist "bin\node" set "PATH=%cd%\bin\node;%PATH%"
 if not exist "node_modules" goto :setup
 if not exist "backend\node_modules" goto :setup
 if not exist "frontend\node_modules" goto :setup
+
+:: Check for FFmpeg (either system-wide or in bin\)
+ffmpeg -version >nul 2>&1
+if %errorlevel% neq 0 (
+    if not exist "bin\ffmpeg.exe" goto :setup
+)
+
 goto :launch
 
 :setup

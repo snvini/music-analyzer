@@ -10,12 +10,17 @@ echo "============================================================"
 echo
 
 # 1. Verification of Environment
-# Add local node to PATH if it exists
-if [ -d "$DIR/bin/node/bin" ]; then
-    export PATH="$DIR/bin/node/bin:$PATH"
-fi
+# Function to update path to include local node
+update_local_path() {
+    if [ -d "$DIR/bin/node/bin" ]; then
+        export PATH="$DIR/bin/node/bin:$PATH"
+    fi
+}
 
-if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "frontend/node_modules" ]; then
+update_local_path
+
+# Check for node_modules OR FFmpeg (trigger setup if any missing)
+if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "frontend/node_modules" ] || ! command -v ffmpeg &> /dev/null && [ ! -f "$DIR/bin/ffmpeg" ]; then
     echo "[INFO] First time setup or missing files detected..."
     echo
     chmod +x "$DIR/scripts/setup_mac.sh" &> /dev/null
@@ -24,6 +29,8 @@ if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "fronten
         echo "[ERROR] Setup failed. Please check your internet and try again."
         exit 1
     fi
+    # Re-check path after setup in case node was just installed
+    update_local_path
 fi
 
 # 2. Launching Everything
