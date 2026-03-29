@@ -86,15 +86,26 @@ fi
 echo
 echo "[2/4] Installing dependencies... (This may take a few minutes)"
 "$NODE_BINARY" -v
+
+# Detect if we should use local npm or system npm
+if [ "$NODE_BINARY" = "node" ]; then
+    NPM_CMD="npm"
+else
+    NPM_CMD="$ROOT_DIR/bin/node/bin/npm"
+fi
+
 # Root dependencies
-"$NODE_BINARY" "$(dirname "$NODE_BINARY")/npm" install
+"$NPM_CMD" install
 
 # Backend dependencies
 echo "Installing backend dependencies..."
-cd "$ROOT_DIR/backend" && "$NODE_BINARY" "$(dirname "$NODE_BINARY")/npm" install 2>/dev/null || npm install
+cd "$ROOT_DIR/backend" && "$NPM_CMD" install
 
 # Frontend dependencies
 echo "Installing frontend dependencies..."
+cd "$ROOT_DIR/frontend" && "$NPM_CMD" install
+
+cd "$ROOT_DIR"
 # 4. Set execution permissions for the launch script
 chmod +x launch_mac.sh &> /dev/null
 

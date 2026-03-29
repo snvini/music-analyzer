@@ -68,18 +68,24 @@ echo.
 echo [3/4] Installing project dependencies... (This may take a few minutes)
 echo.
 
+:: Detect if we should use local npm or system npm
+set "NPM_CMD=call npm"
+if "%NODE_BINARY%" neq "node" (
+    set "NPM_CMD=call "%NODE_BINARY%" "%ROOT_DIR%\bin\node\node_modules\npm\bin\npm-cli.js""
+)
+
 echo -- Installing Root dependencies...
-call "%NODE_BINARY%" "%ROOT_DIR%\bin\node\node_modules\npm\bin\npm-cli.js" install 2>nul || call npm install
+%NPM_CMD% install 2>nul
 if %errorlevel% neq 0 echo [WARNING] Root dependencies check failed, continuing...
 
 echo -- Installing Backend dependencies...
 cd /d "%ROOT_DIR%\backend"
-call "%NODE_BINARY%" "%ROOT_DIR%\bin\node\node_modules\npm\bin\npm-cli.js" install 2>nul || call npm install
+%NPM_CMD% install
 if %errorlevel% neq 0 goto :error
 
 echo -- Installing Frontend dependencies...
 cd /d "%ROOT_DIR%\frontend"
-call "%NODE_BINARY%" "%ROOT_DIR%\bin\node\node_modules\npm\bin\npm-cli.js" install 2>nul || call npm install
+%NPM_CMD% install
 if %errorlevel% neq 0 goto :error
 
 cd /d "%ROOT_DIR%"
