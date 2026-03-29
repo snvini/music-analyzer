@@ -11,12 +11,12 @@ This project is designed for **Zero-Configuration**. You don't need to open the 
 
 ### Windows
 1.  Download or Clone the repository.
-2.  Double-click **`START_WINDOWS.bat`**. 🪟
+2.  Double-click **`START_ANALYZER_WINDOWS.bat`**. 🪟
 3.  Wait for the first-time setup to complete. The app will open automatically in your browser.
 
 ### macOS
 1.  Download or Clone the repository.
-2.  Double-click **`START_MAC.command`**. 🍎
+2.  Double-click **`START_ANALYZER_MAC.command`**. 🍎
 3.  If it asks for permissions, click "Open".
 4.  Wait for the setup. The app will open in your browser.
 
@@ -33,8 +33,8 @@ The system will attempt to install these for you, but it's best to have them:
 ---
 
 ## 📂 Folder Structure
-- **`START_WINDOWS.bat`**: Your main entry point for Windows.
-- **`START_MAC.command`**: Your main entry point for macOS.
+- **`START_ANALYZER_WINDOWS.bat`**: Your main entry point for Windows.
+- **`START_ANALYZER_MAC.command`**: Your main entry point for macOS.
 - **`backend/`**: The analysis engine.
 - **`frontend/`**: The user interface.
 - **`scripts/`**: Internal setup scripts.
