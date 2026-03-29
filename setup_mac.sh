@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Music Analyzer - macOS / Linux Setup Wizard
+cd "$(dirname "$0")"
 echo "============================================================"
 echo "  MUSIC ANALYZER - STUDIO QUALITY CHECKER SETUP (UNIX)"
 echo "============================================================"

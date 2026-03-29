@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Music Analyzer - Studio Quality Checker Launch Script
+cd "$(dirname "$0")"
 echo "============================================================"
 echo "  MUSIC ANALYZER - STUDIO QUALITY CHECKER"
 echo "============================================================"
@@ -10,7 +11,7 @@ echo
 if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "frontend/node_modules" ]; then
     echo "[WARNING] Project dependencies are missing. Running setup script..."
     echo
-    bash setup_mac.sh
+    bash ./setup_mac.sh
     if [ $? -ne 0 ]; then
         echo "[ERROR] Setup failed. Please run setup manually."
         exit 1
@@ -24,6 +25,8 @@ echo "Starting analysis engine and user interface..."
 echo
 
 # Using root package.json to run concurrently
+echo "Opening browser..."
+(sleep 5 && open http://localhost:5173) &
 npm start
 
 if [ $? -ne 0 ]; then

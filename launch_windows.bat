@@ -35,6 +35,8 @@ echo A browser window will open shortly.
 echo.
 
 :: Use root package.json to run concurrently
+echo Opening browser...
+start "" http://localhost:5173
 call npm start
 
 :error

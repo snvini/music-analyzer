@@ -5,6 +5,7 @@ title Music Analyzer - Setup Wizard
 echo ============================================================
 echo   MUSIC ANALYZER - STUDIO QUALITY CHECKER SETUP
 echo ============================================================
+cd /d "%~dp0"
 echo.
 
 :: 1. Check for Node.js
