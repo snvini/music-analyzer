@@ -37,9 +37,6 @@ echo [OK] Portable Node.js found locally.
 goto :node_ready
 
 :node_ready
-:: Update PATH for session
-set "PATH=%ROOT_DIR%\bin\node;%PATH%"
-
 :: 2. Check for FFmpeg
 echo [2/4] Verifying FFmpeg (Required for audio analysis)...
 ffmpeg -version >nul 2>&1
@@ -68,24 +65,25 @@ echo.
 echo [3/4] Installing project dependencies... (This may take a few minutes)
 echo.
 
-:: Detect if we should use local npm or system npm
-set "NPM_CMD=call npm"
-if "%NODE_BINARY%" neq "node" (
-    set "NPM_CMD=call "%NODE_BINARY%" "%ROOT_DIR%\bin\node\node_modules\npm\bin\npm-cli.js""
-)
+:: If using PORTABLE node, we need to add it to PATH for npm to work properly
+if "%NODE_BINARY%" neq "node" set "PATH=%ROOT_DIR%\bin\node;%PATH%"
+
+:: Decide which NPM to use
+set "NPM_EXEC=npm"
+if "%NODE_BINARY%" neq "node" set "NPM_EXEC=%ROOT_DIR%\bin\node\npm.cmd"
 
 echo -- Installing Root dependencies...
-%NPM_CMD% install 2>nul
+call %NPM_EXEC% install 2>nul
 if %errorlevel% neq 0 echo [WARNING] Root dependencies check failed, continuing...
 
 echo -- Installing Backend dependencies...
 cd /d "%ROOT_DIR%\backend"
-%NPM_CMD% install
+call %NPM_EXEC% install
 if %errorlevel% neq 0 goto :error
 
 echo -- Installing Frontend dependencies...
 cd /d "%ROOT_DIR%\frontend"
-%NPM_CMD% install
+call %NPM_EXEC% install
 if %errorlevel% neq 0 goto :error
 
 cd /d "%ROOT_DIR%"
