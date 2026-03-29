@@ -81,11 +81,11 @@ echo [3/4] Installing project dependencies... (This may take a few minutes)
 echo.
 
 :: If using PORTABLE node, we need to add it to PATH for npm to work properly
-if "%NODE_BINARY%" neq "node" set "PATH=%ROOT_DIR%\bin\node;%PATH%"
+if "%NODE_BINARY%" neq "node" set "PATH=%ROOT_DIR%\bin\node_v22;%PATH%"
 
 :: Decide which NPM to use
 set "NPM_EXEC=npm"
-if "%NODE_BINARY%" neq "node" set "NPM_EXEC=%ROOT_DIR%\bin\node\npm.cmd"
+if "%NODE_BINARY%" neq "node" set "NPM_EXEC=%ROOT_DIR%\bin\node_v22\npm.cmd"
 
 echo -- Installing Root dependencies...
 call %NPM_EXEC% install 2>nul

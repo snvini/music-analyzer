@@ -15,8 +15,8 @@ echo
 echo "[1/4] Verifying Node.js installation..."
 NODE_BINARY="node"
 if ! command -v node &> /dev/null; then
-    if [ -f "$ROOT_DIR/bin/node/bin/node" ]; then
-        NODE_BINARY="$ROOT_DIR/bin/node/bin/node"
+    if [ -f "$ROOT_DIR/bin/node_v22/bin/node" ]; then
+        NODE_BINARY="$ROOT_DIR/bin/node_v22/bin/node"
         echo "[OK] Portable Node.js found locally."
     else
         echo "[INFO] Node.js not found in system."
@@ -37,13 +37,13 @@ if ! command -v node &> /dev/null; then
         
         echo "Extracting Node.js..."
         # Force cleanup of any partial install
-        rm -rf "$ROOT_DIR/bin/node"
+        rm -rf "$ROOT_DIR/bin/node_v22"
         mkdir -p "$ROOT_DIR/bin/node_tmp"
         tar -xzf "$ROOT_DIR/bin/node.tar.gz" -C "$ROOT_DIR/bin/node_tmp" --strip-components=1
-        mv "$ROOT_DIR/bin/node_tmp" "$ROOT_DIR/bin/node"
+        mv "$ROOT_DIR/bin/node_tmp" "$ROOT_DIR/bin/node_v22"
         rm "$ROOT_DIR/bin/node.tar.gz"
         
-        NODE_BINARY="$ROOT_DIR/bin/node/bin/node"
+        NODE_BINARY="$ROOT_DIR/bin/node_v22/bin/node"
     fi
 fi
 
@@ -94,7 +94,7 @@ echo "[3/4] Installing dependencies... (This may take a few minutes)"
 if [ "$NODE_BINARY" = "node" ]; then
     NPM_CMD="npm"
 else
-    NPM_CMD="$ROOT_DIR/bin/node/bin/npm"
+    NPM_CMD="$ROOT_DIR/bin/node_v22/bin/npm"
 fi
 
 # Root dependencies
