@@ -24,6 +24,7 @@ if exist "bin\node_v22\node.exe" goto :local_node_found
 echo [INFO] Node.js not found or outdated in system.
 echo We will now download a portable version to run the analyzer automatically...
 
+if not exist "bin" mkdir "bin"
 curl -L --progress-bar "https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip" -o "bin\node.zip"
 if %errorlevel% neq 0 (
     echo [ERROR] Download failed. Check your connection.
