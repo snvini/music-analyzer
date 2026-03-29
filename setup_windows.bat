@@ -11,9 +11,27 @@ echo.
 echo [1/4] Verifying Node.js installation...
 node -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Node.js not found. Please install from: https://nodejs.org/
-    pause
-    exit /b 1
+    echo [WARNING] Node.js not found.
+    echo Would you like me to try installing it via Windows Winget? (Y/N)
+    set /p install_node=
+    if /i "%install_node%"=="Y" (
+        echo Attempting to install Node.js (LTS)...
+        winget install OpenJS.NodeJS.LTS
+        if %errorlevel% neq 0 (
+            echo [ERROR] Failed to install Node.js via Winget. 
+            echo Please install manually: https://nodejs.org/
+            pause
+            exit /b 1
+        ) else (
+            echo [OK] Node.js installed! Please restart this setup after installation completes.
+            pause
+            exit /b 0
+        )
+    ) else (
+        echo [ERROR] Node.js is mandatory. Setup cannot continue.
+        pause
+        exit /b 1
+    )
 )
 echo [OK] Node.js detected.
 echo.
