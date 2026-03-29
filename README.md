@@ -1,5 +1,11 @@
-# Music Analyzer HUD 🎛️
-**BY DJ VINIISH**
+# 🎵 Music Analyzer - Studio Quality Checker
+
+> [!CAUTION]
+> **SEGURANÇA EM PRIMEIRO LUGAR**: Baixe o Music Analyzer **APENAS** através do repositório oficial no GitHub (`snvini/music-analyzer`). Este projeto é **Código Aberto**, seguro e transparente. Versões baixadas de outras fontes podem conter scripts maliciosos que podem danificar seus arquivos ou seu computador.
+> 
+> **SAFETY FIRST**: Only download Music Analyzer from the official GitHub repository (`snvini/music-analyzer`). This project is **Open Source**, safe, and transparent. Versions from third-party sources may contain malware or scripts that could harm your files.
+
+---
 
 A high-fidelity, professional-grade audio toolkit designed for DJs to recursively scan music libraries, verify spectral integrity, and identify "inflated" audio files (fake high-quality rips).
 
