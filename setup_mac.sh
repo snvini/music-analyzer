@@ -7,46 +7,14 @@ echo "  MUSIC ANALYZER - STUDIO QUALITY CHECKER SETUP (UNIX)"
 echo "============================================================"
 echo
 
-# 0. Check for Homebrew (Required for Mac auto-install)
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    if ! command -v brew &> /dev/null; then
-        echo "[WARNING] Homebrew (Mac Package Manager) not found."
-        echo "Would you like me to install Homebrew? It's the standard way to install FFmpeg and Node. (y/n)"
-        read -r install_brew
-        if [[ $install_brew == "y" ]]; then
-            echo "Installing Homebrew... This may take a while and require your password."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            # Add brew to path for the current session
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-            eval "$(/usr/local/bin/brew shellenv)"
-        else
-            echo "[WARNING] Skipping Homebrew. You must install Node and FFmpeg manually."
-        fi
-    fi
-fi
-
 # 1. Check for Node.js
 echo "[1/4] Verifying Node.js installation..."
 if ! command -v node &> /dev/null; then
-    echo "[WARNING] Node.js not found."
-    if [[ "$OSTYPE" == "darwin"* ]] && command -v brew &> /dev/null; then
-        echo "Would you like me to install Node.js via Homebrew? (y/n)"
-        read -r install_node
-        if [[ $install_node == "y" ]]; then
-            echo "Attempting to install Node.js (LTS)..."
-            brew install node
-            if ! command -v node &> /dev/null; then
-                echo "[ERROR] Failed to install Node.js via Homebrew. Please install manually: https://nodejs.org/"
-                exit 1
-            fi
-        else
-            echo "[ERROR] Node.js is mandatory. Setup cannot continue."
-            exit 1
-        fi
-    else
-        echo "[ERROR] Node.js not found. Please install from: https://nodejs.org/"
-        exit 1
-    fi
+    echo "[ERROR] Node.js not found."
+    echo "Node.js is mandatory to run this project."
+    echo "Please download and install it from: https://nodejs.org/"
+    echo "After installing, please restart this setup."
+    exit 1
 fi
 echo "[OK] Node.js detected: $(node -v)"
 echo
