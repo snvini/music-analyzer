@@ -7,12 +7,30 @@ echo "  MUSIC ANALYZER - STUDIO QUALITY CHECKER SETUP (UNIX)"
 echo "============================================================"
 echo
 
+# 0. Check for Homebrew (Required for Mac auto-install)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if ! command -v brew &> /dev/null; then
+        echo "[WARNING] Homebrew (Mac Package Manager) not found."
+        echo "Would you like me to install Homebrew? It's the standard way to install FFmpeg and Node. (y/n)"
+        read -r install_brew
+        if [[ $install_brew == "y" ]]; then
+            echo "Installing Homebrew... This may take a while and require your password."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            # Add brew to path for the current session
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+            eval "$(/usr/local/bin/brew shellenv)"
+        else
+            echo "[WARNING] Skipping Homebrew. You must install Node and FFmpeg manually."
+        fi
+    fi
+fi
+
 # 1. Check for Node.js
 echo "[1/4] Verifying Node.js installation..."
 if ! command -v node &> /dev/null; then
     echo "[WARNING] Node.js not found."
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "It looks like you are on macOS. Would you like me to try installing Node.js via Homebrew? (y/n)"
+    if [[ "$OSTYPE" == "darwin"* ]] && command -v brew &> /dev/null; then
+        echo "Would you like me to install Node.js via Homebrew? (y/n)"
         read -r install_node
         if [[ $install_node == "y" ]]; then
             echo "Attempting to install Node.js (LTS)..."
@@ -33,26 +51,36 @@ fi
 echo "[OK] Node.js detected: $(node -v)"
 echo
 
-# 2. Check for FFmpeg
+# 2. Check for FFmpeg (Prioritizing local portable install)
 echo "[2/4] Verifying FFmpeg (Required for audio analysis)..."
-if ! command -v ffmpeg &> /dev/null; then
-    echo "[WARNING] FFmpeg not found in your PATH."
+LOCAL_FFMPEG="./bin/ffmpeg"
+if ! command -v ffmpeg &> /dev/null && [ ! -f "$LOCAL_FFMPEG" ]; then
+    echo "[WARNING] FFmpeg not found on your system."
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "It looks like you are on macOS. Would you like me to try installing FFmpeg via Homebrew? (y/n)"
-        read -r install_ffmpeg
-        if [[ $install_ffmpeg == "y" ]]; then
-            echo "Attempting to install FFmpeg..."
-            brew install ffmpeg
-            if ! command -v ffmpeg &> /dev/null; then
-                echo "[ERROR] Failed to install FFmpeg via Homebrew. Please install manually: https://ffmpeg.org/"
-            fi
+        echo "Would you like me to download a PORTABLE version of FFmpeg automatically? (Recommended) (y/n)"
+        read -r install_portable
+        if [[ $install_portable == "y" ]]; then
+            echo "Creating local bin folder..."
+            mkdir -p bin
+            
+            echo "Downloading FFmpeg Static Binary for Mac (this may take a minute)..."
+            curl -L -o ffmpeg.zip https://evermeet.cx/ffmpeg/get/zip
+            unzip -o ffmpeg.zip -d bin/
+            rm ffmpeg.zip
+            
+            echo "Downloading FFprobe Static Binary for Mac..."
+            curl -L -o ffprobe.zip https://evermeet.cx/ffprobe/get/zip
+            unzip -o ffprobe.zip -d bin/
+            rm ffprobe.zip
+            
+            chmod +x bin/ffmpeg bin/ffprobe
+            echo "[OK] Portable FFmpeg installed inside the project folder."
         fi
     else
         echo "Please install FFmpeg via your package manager (e.g., sudo apt install ffmpeg)."
     fi
-    echo "The system will not function correctly without FFmpeg."
 else
-    echo "[OK] FFmpeg detected."
+    echo "[OK] FFmpeg binary found."
 fi
 echo
 

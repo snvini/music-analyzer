@@ -46,15 +46,22 @@ if %errorlevel% neq 0 (
     set /p install_ffmpeg=
     if /i "%install_ffmpeg%"=="Y" (
         echo Attempting to install FFmpeg...
-        winget install Gyan.FFmpeg
+        winget --version >nul 2>&1
         if %errorlevel% neq 0 (
-            echo [ERROR] Failed to install via Winget. 
-            echo Please install manually: https://ffmpeg.org/download.html
+            echo [ERROR] Winget is missing on this system (Older Windows 10/7).
+            echo Please install FFmpeg manually: https://www.gyan.dev/ffmpeg/builds/
             pause
         ) else (
-            echo [OK] FFmpeg installed! Please restart this setup after installation completes.
-            pause
-            exit /b 0
+            winget install Gyan.FFmpeg
+            if %errorlevel% neq 0 (
+                echo [ERROR] Failed to install via Winget. 
+                echo Please install manually: https://ffmpeg.org/download.html
+                pause
+            ) else (
+                echo [OK] FFmpeg installed! Please restart this setup after installation completes.
+                pause
+                exit /b 0
+            )
         )
     ) else (
         echo [WARNING] The system will not function without FFmpeg.
