@@ -10,6 +10,11 @@ echo ============================================================
 echo.
 
 :: 1. Verification of Environment
+:: Add local node to PATH if it exists
+if exist "bin\node" (
+    set "PATH=%cd%\bin\node;%PATH%"
+)
+
 if not exist "node_modules" (
     goto :setup
 )
