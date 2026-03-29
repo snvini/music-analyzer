@@ -27,6 +27,9 @@ This project is designed for **Zero-Configuration**. You don't need to open the 
     - Right-click the file and select **Open**. 
     - OR follow the [Fix Permissions](#-mac-troubleshooting) guide below.
 
+> [!TIP]
+> **MAC TIP (Zero Terminal)**: The easiest way to avoid permission issues on Mac is to download the project using [GitHub Desktop](https://desktop.github.com/). It handles all file permissions automatically, so you can just double-click to start!
+
 ---
 
 ## ⚠️ Mac Troubleshooting
