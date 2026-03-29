@@ -10,9 +10,19 @@ echo ============================================================
 echo.
 
 :: 1. Verification of Environment
-:: Add local node to PATH if it exists
-if exist "bin\node" set "PATH=%cd%\bin\node;%PATH%"
+:: Detect Node location without using fragile IF blocks
+if exist "bin\node\node.exe" goto :use_local_node
+node -v >nul 2>&1
+if %errorlevel% neq 0 goto :setup
+set "NPM_CMD=npm"
+goto :check_modules
 
+:use_local_node
+set "PATH=%CD%\bin\node;%PATH%"
+set "NPM_CMD=%CD%\bin\node\npm.cmd"
+goto :check_modules
+
+:check_modules
 if not exist "node_modules" goto :setup
 if not exist "backend\node_modules" goto :setup
 if not exist "frontend\node_modules" goto :setup
@@ -53,8 +63,8 @@ echo.
 :: Launch browser in background (wait 5 sec for server)
 start /b cmd /c "timeout /t 5 >nul && start http://localhost:5173"
 
-:: Start the system
-npm start
+:: Start the system using the detected NPM command
+call %NPM_CMD% start
 
 if %errorlevel% neq 0 (
     echo.
