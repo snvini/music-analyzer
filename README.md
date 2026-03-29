@@ -1,5 +1,7 @@
 # 🎵 Music Analyzer - Studio Quality Checker
 
+### 🌐 Official Website: [music-analyzer.pages.dev](https://music-analyzer.pages.dev/)
+
 > [!CAUTION]
 > **SEGURANÇA EM PRIMEIRO LUGAR**: Baixe o Music Analyzer **APENAS** através do repositório oficial no GitHub (`snvini/music-analyzer`). Este projeto é **Código Aberto**, seguro e transparente. Versões baixadas de outras fontes podem conter scripts maliciosos que podem danificar seus arquivos ou seu computador.
 > 
@@ -7,7 +9,7 @@
 
 ---
 
-A high-fidelity, professional-grade audio toolkit designed for DJs to recursively scan music libraries, verify spectral integrity, and identify "inflated" audio files (fake high-quality rips).
+A high-fidelity, professional-grade audio toolkit designed for DJs to recursively scan music libraries, verify spectral integrity, and identify "inflated" audio files (fake high-quality rips). Now bundled with **Zero-Configuration** for both Windows and Mac.
 
 ---
 

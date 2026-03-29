@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # Music Analyzer - Studio Quality Checker Unified Start Script
-cd "$(dirname "$0")"
+DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$DIR"
+
 echo "============================================================"
 echo "  MUSIC ANALYZER - UNIFIED STARTUP (macOS)"
 echo "============================================================"
@@ -11,8 +13,8 @@ echo
 if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "frontend/node_modules" ]; then
     echo "[INFO] First time setup or missing files detected..."
     echo
-    chmod +x scripts/setup_mac.sh &> /dev/null
-    bash ./scripts/setup_mac.sh
+    chmod +x "$DIR/scripts/setup_mac.sh" &> /dev/null
+    bash "$DIR/scripts/setup_mac.sh"
     if [ $? -ne 0 ]; then
         echo "[ERROR] Setup failed. Please check your internet and try again."
         exit 1
