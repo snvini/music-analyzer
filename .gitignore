@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json
+jspm_packages/
+dist/
+web-dist/
+
+# Local Environment & Assets (Requested Exclusions)
+landing/
+site/
+trash/
+prints/
+*.log
+
+# Python Environments
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# IDE / OS specific
+.DS_Store
+.vscode/
+.idea/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build artifacts
+frontend/dist/
+backend/dist/
+*.exe
+*.dll
+*.so
+*.dylib

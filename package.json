@@ -1,0 +1,17 @@
+{
+  "name": "music-analyzer-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root package for Studio Music Analyzer orchestration",
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "start": "concurrently -n \"BACKEND,FRONTEND\" -c \"magenta,cyan\" \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && node server.js",
+    "start:frontend": "cd frontend && npm run dev",
+    "setup": "node scripts/setup-check.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  }
+}
