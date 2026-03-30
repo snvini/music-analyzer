@@ -104,3 +104,10 @@ Built out of personal necessity for library security. Being **Open Source** mean
 
 ## 🤝 Support & Credit
 Built with **Love for DJing** by **[DJ Viniish](https://www.instagram.com/viniishdj/)**.
+
+If this tool saved your set or your library, consider supporting the project:
+
+| Method | Link |
+|---|---|
+| ☕ Buy Me a Coffee | [buymeacoffee.com/viniish](https://buymeacoffee.com/viniish) |
+| 🇧🇷 PIX (Brazil) | Key available on the [official website](https://music-analyzer.pages.dev/) — scan the QR code there |
