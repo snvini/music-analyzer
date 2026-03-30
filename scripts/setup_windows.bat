@@ -58,28 +58,28 @@ goto :ffmpeg_ready
 
 :check_local_ffmpeg
 if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
-if exist "%ROOT_DIR%\bin\ffmpeg.exe" goto :local_ffmpeg_found
-echo FFmpeg not found. Downloading Mini-Essentials version (~25MB)...
-:: Using Gyan.dev Essentials Release - Significantly smaller and more stable than "master"
-curl -L --progress-bar "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -o "%ROOT_DIR%\bin\ffmpeg.zip"
-if %errorlevel% neq 0 (
-    echo [ERROR] FFmpeg download failed.
-    echo Trying fallback source...
-    curl -L --progress-bar "https://github.com/GyanD/codexffmpeg/releases/download/7.1/ffmpeg-7.1-essentials_build.zip" -o "%ROOT_DIR%\bin\ffmpeg.zip"
-)
+:: Verifica na pasta unificada (bin\ffmpeg\)
+if exist "%ROOT_DIR%\bin\ffmpeg\ffmpeg.exe" goto :local_ffmpeg_found
 
-if not exist "%ROOT_DIR%\bin\ffmpeg.zip" (
-    echo [ERROR] Could not download FFmpeg. Please check your internet.
+echo FFmpeg not found. Downloading Lightweight version (~60MB)...
+:: Usando ffbinaries para Windows (Download direto, mais leve e rápido)
+curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffmpeg&os=windows-64" -o "%ROOT_DIR%\bin\ffmpeg_temp.zip"
+curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffprobe&os=windows-64" -o "%ROOT_DIR%\bin\ffprobe_temp.zip"
+
+if %errorlevel% neq 0 (
+    echo [ERROR] FFmpeg download failed. Please check your internet.
     pause
     exit /b 1
 )
 
-echo Extracting FFmpeg...
-:: Clean up any partial install
-if exist "%ROOT_DIR%\bin\ffmpeg_tmp" rmdir /s /q "%ROOT_DIR%\bin\ffmpeg_tmp"
-powershell -Command "Expand-Archive -Path '%ROOT_DIR%\bin\ffmpeg.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg_tmp'; Get-ChildItem -Path '%ROOT_DIR%\bin\ffmpeg_tmp\*\bin\*' | Move-Item -Destination '%ROOT_DIR%\bin\'; Remove-Item '%ROOT_DIR%\bin\ffmpeg_tmp' -Recurse -Force; Remove-Item '%ROOT_DIR%\bin\ffmpeg.zip' -Force"
+echo Extracting FFmpeg & FFprobe...
+:: Limpeza de qualquer instalação parcial anterior
+if exist "%ROOT_DIR%\bin\ffmpeg" rmdir /s /q "%ROOT_DIR%\bin\ffmpeg"
+mkdir "%ROOT_DIR%\bin\ffmpeg"
 
-if not exist "%ROOT_DIR%\bin\ffmpeg.exe" (
+powershell -Command "Expand-Archive -Path '%ROOT_DIR%\bin\ffmpeg_temp.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg\'; Expand-Archive -Path '%ROOT_DIR%\bin\ffprobe_temp.zip' -DestinationPath '%ROOT_DIR%\bin\ffmpeg\'; Remove-Item '%ROOT_DIR%\bin\ffmpeg_temp.zip'; Remove-Item '%ROOT_DIR%\bin\ffprobe_temp.zip'"
+
+if not exist "%ROOT_DIR%\bin\ffmpeg\ffmpeg.exe" (
     echo [ERROR] Logic failure during FFmpeg extraction.
     pause
     exit /b 1

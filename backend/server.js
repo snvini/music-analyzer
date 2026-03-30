@@ -20,7 +20,8 @@ const ext = isWin ? '.exe' : '';
 // Common paths for Mac/Linux and local portable bin
 const COMMON_FFMPEG_PATHS = [
     FFMPEG_PATH,
-    path.join(__dirname, '..', 'bin', `ffmpeg${ext}`), // Local portable installation
+    path.join(__dirname, '..', 'bin', `ffmpeg${ext}`), // Local portable (root of bin)
+    path.join(__dirname, '..', 'bin', 'ffmpeg', `ffmpeg${ext}`), // Local portable (nested folder)
     '/usr/local/bin/ffmpeg',
     '/opt/homebrew/bin/ffmpeg',
     '/usr/bin/ffmpeg'
@@ -28,7 +29,8 @@ const COMMON_FFMPEG_PATHS = [
 
 const COMMON_FFPROBE_PATHS = [
     FFPROBE_PATH,
-    path.join(__dirname, '..', 'bin', `ffprobe${ext}`),
+    path.join(__dirname, '..', 'bin', `ffprobe${ext}`), // Local portable (root of bin)
+    path.join(__dirname, '..', 'bin', 'ffmpeg', `ffprobe${ext}`), // Local portable (nested folder)
     '/usr/local/bin/ffprobe',
     '/opt/homebrew/bin/ffprobe',
     '/usr/bin/ffprobe'
