@@ -66,11 +66,11 @@ if ! command -v ffmpeg &> /dev/null; then
         echo "FFmpeg not found. Downloading Mini-Portable version (~20MB)..."
         mkdir -p "$ROOT_DIR/bin"
         
-        # Using ffbinaries CDN - Fast and Lightweight
+        # Using Direct Download URLs from ffbinaries CDN
         # Download FFmpeg
-        curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffmpeg&os=macos-64" -o "$ROOT_DIR/bin/ffmpeg.zip"
+        curl -L --progress-bar "https://ffbinaries.com/api/v1/download/latest/ffmpeg/macos-64" -o "$ROOT_DIR/bin/ffmpeg.zip"
         # Download FFprobe
-        curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffprobe&os=macos-64" -o "$ROOT_DIR/bin/ffprobe.zip"
+        curl -L --progress-bar "https://ffbinaries.com/api/v1/download/latest/ffprobe/macos-64" -o "$ROOT_DIR/bin/ffprobe.zip"
         
         echo "Extracting FFmpeg & FFprobe..."
         mkdir -p "$ROOT_DIR/bin/ffmpeg"

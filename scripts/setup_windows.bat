@@ -62,9 +62,9 @@ if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
 if exist "%ROOT_DIR%\bin\ffmpeg\ffmpeg.exe" goto :local_ffmpeg_found
 
 echo FFmpeg not found. Downloading Lightweight version (~60MB)...
-:: Usando ffbinaries para Windows (Download direto, mais leve e rápido)
-curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffmpeg&os=windows-64" -o "%ROOT_DIR%\bin\ffmpeg_temp.zip"
-curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffprobe&os=windows-64" -o "%ROOT_DIR%\bin\ffprobe_temp.zip"
+:: Usando links DIRETOS de download do ffbinaries para evitar corrupção
+curl -L --progress-bar "https://ffbinaries.com/api/v1/download/latest/ffmpeg/windows-64" -o "%ROOT_DIR%\bin\ffmpeg_temp.zip"
+curl -L --progress-bar "https://ffbinaries.com/api/v1/download/latest/ffprobe/windows-64" -o "%ROOT_DIR%\bin\ffprobe_temp.zip"
 
 if %errorlevel% neq 0 (
     echo [ERROR] FFmpeg download failed. Please check your internet.
@@ -72,7 +72,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo Extracting FFmpeg & FFprobe...
+echo Extracting FFmpeg and FFprobe...
 :: Limpeza de qualquer instalação parcial anterior
 if exist "%ROOT_DIR%\bin\ffmpeg" rmdir /s /q "%ROOT_DIR%\bin\ffmpeg"
 mkdir "%ROOT_DIR%\bin\ffmpeg"
