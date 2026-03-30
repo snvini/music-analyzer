@@ -12,40 +12,43 @@ echo "============================================================"
 echo
 
 # 1. Check for Node.js
-echo "[1/4] Verifying Node.js installation..."
-NODE_BINARY="node"
-if ! command -v node &> /dev/null; then
-    if [ -f "$ROOT_DIR/bin/node_v22/bin/node" ]; then
-        NODE_BINARY="$ROOT_DIR/bin/node_v22/bin/node"
-        echo "[OK] Portable Node.js found locally."
-    else
-        echo "[INFO] Node.js not found in system."
-        echo "We will now download a portable version to run the analyzer automatically..."
-        
-        # Detect Architecture
-        echo "Downloading portable version for macOS..."
-        
-        mkdir -p "$ROOT_DIR/bin"
-        # Determine architecture
-        ARCH=$(uname -m)
-        NODE_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-x64.tar.gz"
-        if [ "$ARCH" = "arm64" ]; then
-            NODE_URL="https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-arm64.tar.gz"
-        fi
+echo "[1/4] Verifying Node.js environment..."
+echo "[INFO] Forcing isolated portable Node.js for maximum stability..."
 
-        curl -L --progress-bar "$NODE_URL" -o "$ROOT_DIR/bin/node.tar.gz"
-        
-        echo "Extracting Node.js..."
-        # Force cleanup of any partial install
-        rm -rf "$ROOT_DIR/bin/node_v22"
-        mkdir -p "$ROOT_DIR/bin/node_tmp"
-        tar -xzf "$ROOT_DIR/bin/node.tar.gz" -C "$ROOT_DIR/bin/node_tmp" --strip-components=1
-        mv "$ROOT_DIR/bin/node_tmp" "$ROOT_DIR/bin/node_v22"
-        rm "$ROOT_DIR/bin/node.tar.gz"
-        
-        NODE_BINARY="$ROOT_DIR/bin/node_v22/bin/node"
-    fi
+# Determine OS and Architecture
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+NODE_VER="v22.13.1"
+EXT="tar.gz"
+
+if [ "$OS" = "darwin" ]; then
+    PLATFORM="darwin"
+    if [ "$ARCH" = "arm64" ]; then ARCH_SUFFIX="arm64"; else ARCH_SUFFIX="x64"; fi
+elif [ "$OS" = "linux" ]; then
+    PLATFORM="linux"
+    EXT="tar.xz"
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then ARCH_SUFFIX="arm64"; else ARCH_SUFFIX="x64"; fi
+else
+    echo "[ERROR] Unsupported OS: $OS"
+    exit 1
 fi
+
+NODE_URL="https://nodejs.org/dist/$NODE_VER/node-$NODE_VER-$PLATFORM-$ARCH_SUFFIX.$EXT"
+
+if [ ! -f "$ROOT_DIR/bin/node_v22/bin/node" ]; then
+    echo "Downloading portable Node.js for $OS ($ARCH_SUFFIX)..."
+    mkdir -p "$ROOT_DIR/bin"
+    curl -L --progress-bar "$NODE_URL" -o "$ROOT_DIR/bin/node.$EXT"
+    
+    echo "Extracting Node.js..."
+    rm -rf "$ROOT_DIR/bin/node_v22"
+    mkdir -p "$ROOT_DIR/bin/node_tmp"
+    tar -xf "$ROOT_DIR/bin/node.$EXT" -C "$ROOT_DIR/bin/node_tmp" --strip-components=1
+    mv "$ROOT_DIR/bin/node_tmp" "$ROOT_DIR/bin/node_v22"
+    rm "$ROOT_DIR/bin/node.$EXT"
+fi
+
+NODE_BINARY="$ROOT_DIR/bin/node_v22/bin/node"
 
 # Double check if binary exists now
 if [ ! -f "$NODE_BINARY" ] && [ "$NODE_BINARY" != "node" ]; then
@@ -94,6 +97,8 @@ echo "[OK] FFmpeg ready."
 # 3. Install dependencies
 echo
 echo "[3/4] Installing dependencies... (This may take a few minutes)"
+echo "[INFO] Ensuring a fresh installation for consistency..."
+rm -rf "$ROOT_DIR/node_modules"
 "$NODE_BINARY" -v
 
 # Detect if we should use local npm or system npm

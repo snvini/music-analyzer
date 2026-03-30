@@ -9,37 +9,32 @@ echo "  MUSIC ANALYZER - UNIFIED STARTUP (macOS)"
 echo "============================================================"
 echo
 
-# 1. Verification of Environment
-# Function to update path to include local node
-update_local_path() {
-    if [ -d "$DIR/bin/node/bin" ]; then
-        export PATH="$DIR/bin/node/bin:$PATH"
-    fi
-}
-
-update_local_path
-
 verify_and_start() {
     # 1. Setup Environment PATH
-    # This ensures we use the portable Node.js if it exists and sub-processes can find tools
-    if [ -d "$DIR/bin/node_v22/bin" ]; then
-        export PATH="$DIR/bin/node_v22/bin:$PATH"
+    # We ALWAYS prioritize the portable Node for the studio environment
+    if [ ! -d "$DIR/bin/node_v22/bin" ]; then
+        echo "[INFO] Portable environment not found. Forcing setup..."
+        bash "$DIR/scripts/setup_mac.sh"
+        if [ $? -ne 0 ]; then
+            echo "[ERROR] Setup failed. Please check the errors above."
+            exit 1
+        fi
     fi
+
+    # Ensuring portable Node is in PATH
+    export PATH="$DIR/bin/node_v22/bin:$PATH"
 
     # Export local node_modules/.bin paths for sub-process resolution
     export PATH="$DIR/node_modules/.bin:$DIR/backend/node_modules/.bin:$DIR/frontend/node_modules/.bin:$PATH"
 
     # 2. Check for node_modules to see if we need setup
     if [ ! -d "$DIR/node_modules" ] || [ ! -d "$DIR/frontend/node_modules" ] || [ ! -d "$DIR/backend/node_modules" ]; then
-        echo "[INFO] First time setup or missing files detected..."
+        echo "[INFO] Dependencies missing. Running setup..."
         bash "$DIR/scripts/setup_mac.sh"
         if [ $? -ne 0 ]; then
-            echo "[ERROR] Setup failed. Please check the errors above."
+            echo "[ERROR] Setup failed."
             exit 1
         fi
-        # Re-verify after setup
-        verify_and_start
-        return
     fi
 }
 

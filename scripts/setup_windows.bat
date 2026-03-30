@@ -12,12 +12,9 @@ set "ROOT_DIR=%cd%"
 echo.
 
 :: 1. Check for Node.js
-echo [1/4] Verifying Node.js installation...
-set "NODE_BINARY=node"
-node -v >nul 2>&1
-if %errorlevel% neq 0 goto :check_local_node
-echo [OK] Node.js is already installed on the system.
-goto :node_ready
+echo [1/4] Verifying Node.js environment...
+echo [INFO] Forcing isolated portable Node.js for maximum stability...
+goto :check_local_node
 
 :check_local_node
 if exist "bin\node_v22\node.exe" goto :local_node_found
@@ -44,7 +41,7 @@ if not exist "bin\node_v22\node.exe" (
 )
 
 :local_node_found
-set "NODE_BINARY=%ROOT_DIR%\bin\node\node.exe"
+set "NODE_BINARY=%ROOT_DIR%\bin\node_v22\node.exe"
 echo [OK] Portable Node.js found locally.
 goto :node_ready
 
@@ -98,6 +95,8 @@ echo.
 
 :: 3. Install dependencies
 echo [3/4] Installing project dependencies... (This may take a few minutes)
+echo [INFO] Ensuring a fresh installation for consistency...
+if exist "node_modules" rmdir /s /q "node_modules"
 echo.
 
 :: If using PORTABLE node, we need to add it to PATH for npm to work properly
