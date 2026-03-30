@@ -1,5 +1,7 @@
 # 🎵 Music Analyzer - Studio Quality Checker
 
+![Version](https://img.shields.io/badge/version-0.8.0-06b6d4?style=flat-square) ![Status](https://img.shields.io/badge/status-beta-orange?style=flat-square) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey?style=flat-square)
+
 ### 🌐 Official Website: [music-analyzer.pages.dev](https://music-analyzer.pages.dev/)
 
 > [!CAUTION]

@@ -7,7 +7,7 @@ cd "$SCRIPTS_DIR/.."
 ROOT_DIR="$(pwd)"
 
 echo "============================================================"
-echo "  MUSIC ANALYZER - STUDIO QUALITY CHECKER SETUP (UNIX)"
+echo "  MUSIC ANALYZER v0.8.0 - STUDIO QUALITY CHECKER (UNIX)"
 echo "============================================================"
 echo
 

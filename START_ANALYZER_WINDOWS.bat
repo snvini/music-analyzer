@@ -5,7 +5,7 @@ cd /d "%~dp0"
 title MUSIC ANALYZER - STUDIO QUALITY CHECKER
 
 echo ============================================================
-echo   MUSIC ANALYZER - UNIFIED STARTUP
+echo   MUSIC ANALYZER - STUDIO QUALITY CHECKER  [v0.8.0]
 echo ============================================================
 echo.
 

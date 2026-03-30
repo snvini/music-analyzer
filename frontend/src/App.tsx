@@ -160,7 +160,7 @@ function App() {
           </div>
           <div className="title">
             <h1>Music Analyzer</h1>
-            <p>// AUDIO_QUALITY_VERIFICATION by DJ Viniish</p>
+            <p>// AUDIO_QUALITY_VERIFICATION by DJ Viniish <span style={{ opacity: 0.35, marginLeft: '0.75rem' }}>v0.8.0</span></p>
           </div>
         </div>
         <div className="stats-badge">
