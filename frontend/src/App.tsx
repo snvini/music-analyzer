@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, FolderSearch, BarChart2, FileAudio, X, Search, ShieldAlert } from 'lucide-react';
+import { Activity, FolderSearch, BarChart2, FileAudio, X, Search, ShieldAlert, Zap, Clock } from 'lucide-react';
 import './index.css';
 import { TableView } from './views/TableView';
 import { ExplorerView } from './views/ExplorerView';
@@ -15,7 +15,7 @@ export interface AudioRecord {
   codec: string;
   sampleRate: string;
   bitrate: string;
-  status: 'INFLATED' | 'REAL' | 'SUSPICIOUS' | 'OK';
+  status: 'INFLATED' | 'REAL' | 'MEDIUM' | 'OK' | 'UNKNOWN';
   review: string;
   path: string;
   tags?: string[];
@@ -27,7 +27,8 @@ function App() {
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [statusMsg, setStatusMsg] = useState('Ready');
   const [results, setResults] = useState<AudioRecord[]>([]);
-  const [filter, setFilter] = useState<'ALL' | 'INFLATED' | 'OK' | 'SUSPICIOUS' | 'REAL'>('ALL');
+  const [filter, setFilter] = useState<'ALL' | 'INFLATED' | 'OK' | 'MEDIUM' | 'REAL'>('ALL');
+  const [scanMode, setScanMode] = useState<'full' | 'quick'>('full');
   const [activeTab, setActiveTab] = useState<'TABLE' | 'EXPLORER' | 'ANALYTICS'>('TABLE');
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [showFolderBrowser, setShowFolderBrowser] = useState(false);
@@ -77,11 +78,19 @@ function App() {
     setProgress({ current: 0, total: 0 });
     setStatusMsg('Preparing scan...');
 
-    const eventSource = new EventSource(`http://localhost:3001/api/scan?path=${encodeURIComponent(folderPath)}`);
+    setResults([]); // Clear results before starting a new scan
+    setStatusMsg('Preparing scan...');
+
+    const scanUrl = `http://localhost:3001/api/scan?path=${encodeURIComponent(folderPath)}${scanMode === 'quick' ? '&quick=true' : ''}`;
+    const eventSource = new EventSource(scanUrl);
 
     eventSource.addEventListener('status', (e) => {
       const data = JSON.parse((e as MessageEvent).data);
       setStatusMsg(data.message);
+      if (data.message === 'Done') {
+        setIsScanning(false);
+        eventSource.close();
+      }
     });
 
     eventSource.addEventListener('progress', (e) => {
@@ -95,18 +104,11 @@ function App() {
       setResults(prev => [...prev, record]);
     });
 
-    eventSource.addEventListener('done', () => {
-      setStatusMsg('Analysis Complete');
+    eventSource.onerror = () => {
+      setStatusMsg('Connection lost or scan interrupted.');
       setIsScanning(false);
       eventSource.close();
-    });
-
-    eventSource.addEventListener('error', (e) => {
-      const data = JSON.parse((e as MessageEvent).data);
-      setStatusMsg(`Error: ${data.message}`);
-      setIsScanning(false);
-      eventSource.close();
-    });
+    };
   };
 
   const handleTrash = async (paths: string[]) => {
@@ -222,6 +224,34 @@ function App() {
           </button>
         </div>
 
+        {/* Scan Mode Toggle */}
+        <div className="scan-mode-toggle">
+          <span className="scan-mode-label">// SCAN_DEPTH:</span>
+          <div className="scan-mode-buttons">
+            <button
+              className={`scan-mode-btn ${scanMode === 'quick' ? 'active' : ''}`}
+              onClick={() => setScanMode('quick')}
+              disabled={isScanning}
+              title="Analyzes 30 seconds from the middle of each track. Much faster for large libraries."
+            >
+              <Zap size={14} /> QUICK
+            </button>
+            <button
+              className={`scan-mode-btn ${scanMode === 'full' ? 'active' : ''}`}
+              onClick={() => setScanMode('full')}
+              disabled={isScanning}
+              title="Analyzes the entire track. More thorough but takes longer."
+            >
+              <Clock size={14} /> FULL
+            </button>
+          </div>
+          <span className="scan-mode-hint">
+            {scanMode === 'quick' 
+              ? '⚡ 30s sample — faster scan' 
+              : '🔬 Full track — more accurate, slower scan'}
+          </span>
+        </div>
+
         {/* Progress Bar */}
         {isScanning && (
           <div className="progress-container">
@@ -257,7 +287,7 @@ function App() {
       {activeTab === 'TABLE' && (
         <div className="glass-panel table-container">
           <div className="filters">
-            {(['ALL', 'REAL', 'SUSPICIOUS', 'OK', 'INFLATED'] as const).map(f => (
+            {(['ALL', 'REAL', 'MEDIUM', 'OK', 'INFLATED'] as const).map(f => (
               <button 
                 key={f} 
                 onClick={() => setFilter(f)}
@@ -265,7 +295,7 @@ function App() {
               >
                 {f === 'ALL' ? 'All Tracks' : 
                  f === 'REAL' ? 'Good (320k+)' : 
-                 f === 'SUSPICIOUS' ? 'Medium (192k-256k)' : 
+                 f === 'MEDIUM' ? 'Medium (192k-256k)' : 
                  f === 'OK' ? 'OK (128k-191k)' :
                  'Bad (< 128k)'}
               </button>
@@ -276,13 +306,13 @@ function App() {
             filter={filter} 
             expandedId={expandedId} 
             toggleExpand={toggleExpand} 
-            onAnalyze={(r: AudioRecord) => setSpectrogramFile(r)} 
+            onAnalyze={(r: AudioRecord) => { setIsImgLoading(true); setSpectrogramFile(r); }} 
             onTrash={triggerTrash}
           />
         </div>
       )}
 
-      {activeTab === 'EXPLORER' && <ExplorerView results={results} rootPath={folderPath} onAnalyze={(r: AudioRecord) => setSpectrogramFile(r)} />}
+      {activeTab === 'EXPLORER' && <ExplorerView results={results} rootPath={folderPath} onAnalyze={(r: AudioRecord) => { setIsImgLoading(true); setSpectrogramFile(r); }} />}
       {activeTab === 'ANALYTICS' && <AnalyticsView results={results} />}
 
       {spectrogramFile && (
@@ -304,7 +334,7 @@ function App() {
                 </div>
               )}
               <img 
-                src={`http://localhost:3001/api/spectrogram?path=${encodeURIComponent(spectrogramFile.folder + '/' + spectrogramFile.filename)}&t=${Date.now()}`} 
+                src={`http://localhost:3001/api/spectrogram?path=${encodeURIComponent(spectrogramFile.path)}&t=${Date.now()}`} 
                 alt="Spectrogram"
                 className={`spectrogram-img ${!isImgLoading ? 'loaded' : ''}`}
                 onLoad={() => setIsImgLoading(false)}

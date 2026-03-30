@@ -4,7 +4,7 @@ import type { AudioRecord } from '../App';
 
 interface TableViewProps {
   results: AudioRecord[];
-  filter: 'ALL' | 'INFLATED' | 'OK' | 'SUSPICIOUS' | 'REAL';
+  filter: 'ALL' | 'INFLATED' | 'OK' | 'MEDIUM' | 'REAL';
   expandedId: number | null;
   toggleExpand: (id: number) => void;
   onAnalyze: (record: AudioRecord) => void;
@@ -89,9 +89,11 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
   const getStatusBadge = (status: AudioRecord['status']) => {
     switch(status) {
       case 'REAL': return <div className="status-badge status-real">GOOD</div>;
-      case 'SUSPICIOUS': return <div className="status-badge status-suspect">MEDIUM</div>;
+      case 'MEDIUM': return <div className="status-badge status-suspect">MEDIUM</div>;
       case 'OK': return <div className="status-badge status-ok">OK</div>;
       case 'INFLATED': return <div className="status-badge status-inflated">BAD</div>;
+      case 'UNKNOWN': return <div className="status-badge" style={{ opacity: 0.4 }}>—</div>;
+      default: return <div className="status-badge" style={{ opacity: 0.4 }}>—</div>;
     }
   };
 
