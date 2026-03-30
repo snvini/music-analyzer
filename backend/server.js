@@ -3,11 +3,22 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { spawn, exec } = require('child_process');
+const { spawn, exec, execSync } = require('child_process');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Guard: validates that a path string is safe to use on the filesystem.
+// Rejects null/undefined, non-strings, and paths containing null bytes.
+// Does NOT restrict which directories are accessible — it only prevents
+// obviously malformed payloads and normalises the path via path.resolve.
+function isPathSafe(inputPath) {
+    if (!inputPath || typeof inputPath !== 'string') return false;
+    const resolved = path.resolve(inputPath);
+    if (resolved.includes('\0')) return false;
+    return true;
+}
 
 // Configure FFMPEG paths. 
 // For OSS users, it defaults to system PATH.
@@ -184,7 +195,12 @@ app.get('/api/health', async (req, res) => {
 // Endpoint to browse directories
 app.get('/api/browse', async (req, res) => {
     let currentPath = req.query.path || os.homedir();
-    
+
+    // Reject malformed paths before touching the filesystem
+    if (!isPathSafe(currentPath)) {
+        return res.status(400).json({ error: 'Invalid path.' });
+    }
+
     try {
         // Handle empty path
         if (!currentPath) currentPath = os.homedir();
@@ -221,7 +237,6 @@ app.get('/api/roots', (req, res) => {
         roots.push({ label: 'External SSDs', path: '/Volumes', icon: 'hard-drive' });
     } else if (os.platform() === 'win32') {
         try {
-            const { execSync } = require('child_process');
             const driveOutput = execSync('wmic logicaldisk get name').toString();
             const drives = driveOutput.split('\r\n')
                 .filter(line => /[A-Z]:/.test(line))
@@ -241,7 +256,8 @@ app.get('/api/roots', (req, res) => {
 // Event stream endpoint
 app.get('/api/scan', async (req, res) => {
     const folderPath = req.query.path;
-    if (!folderPath || !fs.existsSync(folderPath)) {
+    // Validate path before any filesystem access
+    if (!folderPath || !isPathSafe(folderPath) || !fs.existsSync(folderPath)) {
         return res.status(400).json({ error: 'Invalid or missing directory path.' });
     }
 
@@ -337,7 +353,12 @@ app.get('/api/scan', async (req, res) => {
 // Endpoint to generate an on-demand spectrogram image for a single file
 app.get('/api/spectrogram', (req, res) => {
     const filePath = req.query.path;
-    if (!filePath || !fs.existsSync(filePath)) {
+
+    // Validate path before any filesystem access
+    if (!isPathSafe(filePath)) {
+        return res.status(400).send('Invalid path.');
+    }
+    if (!fs.existsSync(filePath)) {
         return res.status(404).send('File not found');
     }
 
@@ -346,20 +367,35 @@ app.get('/api/spectrogram', (req, res) => {
     res.setHeader('Expires', '0');
 
     const tempFile = path.join(os.tmpdir(), `spec_${Date.now()}.png`);
-    
-    // showspectrumpic for high-res spectrogram, size 1200x500
-    const ffmpegCmd = `"${FFMPEG_PATH}" -v error -i "${filePath}" -lavfi "showspectrumpic=s=1200x500:mode=separate:color=intensity" -frames:v 1 -y "${tempFile}"`;
-    
-    exec(ffmpegCmd, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
-        if (error) {
-            console.error('Spectrogram Generation Error:', stderr || error);
+
+    // Use spawn() with an argument array — never exec() with string interpolation.
+    // This makes shell metacharacters in filePath completely inert.
+    const proc = spawn(FFMPEG_PATH, [
+        '-v', 'error',
+        '-i', filePath,
+        '-lavfi', 'showspectrumpic=s=1200x500:mode=separate:color=intensity',
+        '-frames:v', '1',
+        '-y', tempFile
+    ]);
+
+    let stderr = '';
+    proc.stderr.on('data', (d) => stderr += d.toString());
+
+    proc.on('close', (code) => {
+        if (code !== 0) {
+            console.error('Spectrogram Generation Error:', stderr);
             if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
             return res.status(500).send('Error generating spectrogram');
         }
-        res.sendFile(tempFile, (err) => {
+        res.sendFile(tempFile, () => {
             // Delete immediately after serving to avoid memory/storage leaks
             if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
         });
+    });
+
+    proc.on('error', (err) => {
+        console.error('Could not launch FFmpeg for spectrogram:', err.message);
+        if (!res.headersSent) res.status(500).send('FFmpeg unavailable');
     });
 });
 
@@ -391,6 +427,11 @@ app.post('/api/trash', (req, res) => {
 
     const moveResults = [];
     for (const filePath of filePaths) {
+        // Validate each individual path before touching the filesystem
+        if (!isPathSafe(filePath)) {
+            moveResults.push({ path: filePath, success: false, error: 'Invalid path' });
+            continue;
+        }
         try {
             if (fs.existsSync(filePath)) {
                 const fileName = path.basename(filePath);
