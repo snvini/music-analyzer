@@ -107,17 +107,17 @@ set "NPM_EXEC=npm"
 if "%NODE_BINARY%" neq "node" set "NPM_EXEC=%ROOT_DIR%\bin\node_v22\npm.cmd"
 
 echo -- Installing Root dependencies...
-call %NPM_EXEC% install 2>nul
+call "%NPM_EXEC%" install 2>nul
 if %errorlevel% neq 0 echo [WARNING] Root dependencies check failed, continuing...
 
 echo -- Installing Backend dependencies...
 cd /d "%ROOT_DIR%\backend"
-call %NPM_EXEC% install
+call "%NPM_EXEC%" install
 if %errorlevel% neq 0 goto :error
 
 echo -- Installing Frontend dependencies...
 cd /d "%ROOT_DIR%\frontend"
-call %NPM_EXEC% install
+call "%NPM_EXEC%" install
 if %errorlevel% neq 0 goto :error
 
 cd /d "%ROOT_DIR%"

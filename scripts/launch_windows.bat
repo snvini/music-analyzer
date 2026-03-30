@@ -36,8 +36,15 @@ echo.
 
 :: Use root package.json to run concurrently
 echo Opening browser...
-start "" http://localhost:5173
-call npm start
+start "" http://127.0.0.1:5173
+
+:: Prioritize portable NPM if setup was successful
+set "NPM_EXEC=npm"
+if exist "..\bin\node_v22\npm.cmd" (
+    set "NPM_EXEC=%CD%\..\bin\node_v22\npm.cmd"
+)
+
+call "%NPM_EXEC%" start
 
 :error
 echo [ERROR] Failed to start Music Analyzer.
