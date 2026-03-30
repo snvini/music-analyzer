@@ -41,7 +41,7 @@ verify_and_start() {
 verify_and_start
 
 # 3. Final Verification
-echo "Environment verified successfully! 🚀"
+echo "Environment verified successfully!"
 echo ""
 
 # 4. Start the Application

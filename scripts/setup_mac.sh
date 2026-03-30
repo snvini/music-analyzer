@@ -124,7 +124,7 @@ cd "$ROOT_DIR"
 chmod +x launch_mac.sh &> /dev/null
 
 echo "============================================================"
-echo "  SETUP COMPLETED SUCCESSFULLY! 🚀"
+echo "  SETUP COMPLETED SUCCESSFULLY!"
 echo "============================================================"
 echo
 echo "You can now use './launch_mac.sh' to start the system."

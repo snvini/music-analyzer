@@ -28,7 +28,7 @@ if not exist "frontend\node_modules\" (
 )
 
 :: 2. Launching Everything
-echo Environment successfully verified! 🚀
+echo Environment successfully verified!
 echo.
 echo Starting analysis engine and user interface...
 echo A browser window will open shortly.

@@ -125,7 +125,7 @@ echo.
 echo [4/4] Finalizing configuration...
 echo.
 echo ============================================================
-echo   SETUP COMPLETED SUCCESSFULLY! 🚀
+echo   SETUP COMPLETED SUCCESSFULLY!
 echo ============================================================
 echo.
 echo You can now use 'START_ANALYZER_WINDOWS.bat' 

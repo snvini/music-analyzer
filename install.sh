@@ -25,30 +25,30 @@ fi
 
 # Tenta entrar na pasta. Se não existir, cancela para não poluir a Home
 if [ ! -d "$INSTALL_DIR" ]; then
-    echo "❌ [PT] Erro: Pasta Desktop não encontrada em $INSTALL_DIR"
-    echo "❌ [EN] Error: Desktop folder not found at $INSTALL_DIR"
+    echo "[ERROR] [PT] Erro: Pasta Desktop não encontrada em $INSTALL_DIR"
+    echo "[ERROR] [EN] Error: Desktop folder not found at $INSTALL_DIR"
     exit 1
 fi
 
 cd "$INSTALL_DIR" || exit
 
 echo "---------------------------------------------------"
-echo "🚀 [PT] Iniciando instalação de $FOLDER_NAME..."
-echo "🚀 [EN] Starting $FOLDER_NAME installation..."
+echo "[INFO] [PT] Iniciando instalação de $FOLDER_NAME..."
+echo "[INFO] [EN] Starting $FOLDER_NAME installation..."
 echo "---------------------------------------------------"
 
 # 2. Baixar o projeto sem acionar a Quarentena
 # O curl nativo do macOS não aplica a flag 'com.apple.quarantine'
-echo "📥 [1/4] [PT] Baixando arquivos... / [EN] Downloading files..."
+echo "[1/4] [PT] Baixando arquivos... / [EN] Downloading files..."
 curl -sSL "$REPO_URL" -o "$ZIP_FILE"
 
 if [ $? -ne 0 ]; then
-    echo "❌ [PT] Erro no download. / [EN] Download error."
+    echo "[ERROR] [PT] Erro no download. / [EN] Download error."
     exit 1
 fi
 
 # 3. Extrair sem dependências extras
-echo "📦 [2/4] [PT] Extraindo projeto... / [EN] Extracting project..."
+echo "[2/4] [PT] Extraindo projeto... / [EN] Extracting project..."
 unzip -q "$ZIP_FILE"
 
 if [ -d "$GITHUB_FOLDER_NAME" ]; then
@@ -63,7 +63,7 @@ fi
 rm -f "$ZIP_FILE"
 
 # 4. Permissões de execução
-echo "🔑 [3/4] [PT] Configurando permissões... / [EN] Setting permissions..."
+echo "[3/4] [PT] Configurando permissões... / [EN] Setting permissions..."
 cd "$FOLDER_NAME" || exit
 
 # Aplica permissão em todos os scripts .sh e .command recursivamente
@@ -71,10 +71,10 @@ find . -name "*.sh" -exec chmod +x {} +
 find . -name "*.command" -exec chmod +x {} +
 
 # 6. Feedback visual de sucesso
-echo "✅ [4/4] [PT] Instalação concluída! / [EN] Installation finished!"
+echo "[OK] [4/4] [PT] Instalação concluída! / [EN] Installation finished!"
 echo "---------------------------------------------------"
-echo "📂 [PT] Salvo em: $INSTALL_DIR/$FOLDER_NAME"
-echo "📂 [EN] Saved at: $INSTALL_DIR/$FOLDER_NAME"
-echo "💡 [PT] Para começar, execute: START_ANALYZER_MACLINUX.command"
-echo "💡 [EN] To start, run: START_ANALYZER_MACLINUX.command"
+echo "[FOLDER] [PT] Salvo em: $INSTALL_DIR/$FOLDER_NAME"
+echo "[FOLDER] [EN] Saved at: $INSTALL_DIR/$FOLDER_NAME"
+echo "[INFO] [PT] Para começar, execute: START_ANALYZER_MACLINUX.command"
+echo "[INFO] [EN] To start, run: START_ANALYZER_MACLINUX.command"
 echo "---------------------------------------------------"

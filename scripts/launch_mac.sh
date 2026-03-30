@@ -19,7 +19,7 @@ if [ ! -d "node_modules" ] || [ ! -d "backend/node_modules" ] || [ ! -d "fronten
 fi
 
 # 2. Launching Everything
-echo "Environment verified successfully! 🚀"
+echo "Environment verified successfully!"
 echo
 echo "Starting analysis engine and user interface..."
 echo

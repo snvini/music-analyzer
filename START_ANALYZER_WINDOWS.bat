@@ -61,7 +61,7 @@ pause
 exit /b 1
 
 :launch
-echo [OK] Environment ready! 🚀
+echo [OK] Environment ready!
 echo.
 echo Starting analysis engine...
 echo.
