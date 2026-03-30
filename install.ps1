@@ -2,6 +2,9 @@
 # MUSIC ANALYZER - QUICK INSTALLER (Windows PowerShell)
 # ==============================================================================
 
+# Força UTF-8 para evitar caracteres estranhos (????)
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 # --- CONFIGURAÇÕES / SETTINGS ---
 $REPO_URL = "https://github.com/snvini/music-analyzer/archive/refs/heads/main.zip"
 $FOLDER_NAME = "Music-Analyzer"
@@ -9,15 +12,32 @@ $ZIP_FILE = "music_temp.zip"
 $GITHUB_FOLDER_NAME = "music-analyzer-main"
 
 # 1. Definir o local de instalação de forma DINÂMICA (Desktop/Área de Trabalho/etc)
-# Uses the system's official 'Desktop' folder path regardless of its name
-try {
-    $INSTALL_DIR = [Environment]::GetFolderPath("Desktop")
-    if (-not $INSTALL_DIR) { throw }
-} catch {
+# Busca a pasta oficial de Desktop do sistema
+$INSTALL_DIR = [Environment]::GetFolderPath("Desktop")
+
+# Se falhar (raro), busca no registro do Windows (User Shell Folders)
+if (-not $INSTALL_DIR) {
+    try {
+        $INSTALL_DIR = (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" -ErrorAction SilentlyContinue).Desktop
+    } catch {}
+}
+
+# Expandir variáveis de ambiente caso o registro retorne algo como %USERPROFILE%\Desktop
+if ($INSTALL_DIR) {
+    $INSTALL_DIR = [System.Environment]::ExpandEnvironmentVariables($INSTALL_DIR)
+} else {
+    # Fallback final se nada funcionar: pasta do usuário
     $INSTALL_DIR = Join-Path $HOME "Desktop"
 }
 
-Set-Location $INSTALL_DIR
+# Tenta entrar na pasta. Se não conseguir, cancela para não instalar na pasta errada (/vsoar)
+if (-not (Test-Path $INSTALL_DIR)) {
+    Write-Host "❌ ERRO: Não foi possível localizar sua Área de Trabalho / Desktop folder not found." -ForegroundColor Red
+    Write-Host "Caminho tentado / Attempted path: $INSTALL_DIR"
+    exit 1
+}
+
+Set-Location -Path $INSTALL_DIR -ErrorAction Stop
 
 Write-Host "---------------------------------------------------" -ForegroundColor Cyan
 Write-Host "🚀 [PT] Iniciando instalação de $FOLDER_NAME..."

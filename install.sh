@@ -11,12 +11,23 @@ ZIP_FILE="music_temp.zip"
 GITHUB_FOLDER_NAME="music-analyzer-main"
 
 # 1. Definir o local de instalação de forma DINÂMICA (Desktop/Área de Trabalho/etc)
-# Tenta pegar via AppleScript (mais preciso no Mac) ou fallback para ~/Desktop
 if [[ "$OSTYPE" == "darwin"* ]]; then
+    # No Mac, usa AppleScript para encontrar a pasta oficial (Lida com qualquer idioma)
     INSTALL_DIR=$(osascript -e 'POSIX path of (path to desktop folder)' 2>/dev/null || echo "$HOME/Desktop")
 else
-    # Fallback para Linux ou se osascript falhar
-    INSTALL_DIR="$HOME/Desktop"
+    # No Linux, tenta usar o xdg-user-dir para localizar o Desktop traduzido
+    if command -v xdg-user-dir >/dev/null 2>&1; then
+        INSTALL_DIR=$(xdg-user-dir DESKTOP)
+    else
+        INSTALL_DIR="$HOME/Desktop"
+    fi
+fi
+
+# Tenta entrar na pasta. Se não existir, cancela para não poluir a Home
+if [ ! -d "$INSTALL_DIR" ]; then
+    echo "❌ [PT] Erro: Pasta Desktop não encontrada em $INSTALL_DIR"
+    echo "❌ [EN] Error: Desktop folder not found at $INSTALL_DIR"
+    exit 1
 fi
 
 cd "$INSTALL_DIR" || exit
