@@ -419,6 +419,6 @@ app.post('/api/trash', (req, res) => {
 });
 
 const PORT = 3001;
-app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
+app.listen(PORT, '127.0.0.1', () => {
+    console.log(`Backend server running on http://127.0.0.1:${PORT}`);
 });
