@@ -363,6 +363,20 @@ app.get('/api/spectrogram', (req, res) => {
     });
 });
 
+// Helper to move files robustly (handles cross-drive moves EXDEV)
+function moveFile(src, dest) {
+    try {
+        fs.renameSync(src, dest);
+    } catch (err) {
+        if (err.code === 'EXDEV') {
+            fs.copyFileSync(src, dest);
+            fs.unlinkSync(src);
+        } else {
+            throw err;
+        }
+    }
+}
+
 // Endpoint to move records to a project-internal TRASH folder
 app.post('/api/trash', (req, res) => {
     const { filePaths } = req.body;
@@ -390,7 +404,7 @@ app.post('/api/trash', (req, res) => {
                     finalDest = path.join(trashDir, `${base}_${Date.now()}${ext}`);
                 }
 
-                fs.renameSync(filePath, finalDest);
+                moveFile(filePath, finalDest);
                 moveResults.push({ path: filePath, success: true });
             } else {
                 moveResults.push({ path: filePath, success: false, error: 'File not found' });

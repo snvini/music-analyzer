@@ -14,9 +14,6 @@ interface TableViewProps {
 export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze, onTrash }: TableViewProps) {
   const [sortConfig, setSortConfig] = useState<{ key: keyof AudioRecord; direction: 'asc' | 'desc' } | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [showTrashModal, setShowTrashModal] = useState(false);
-  const [dontShowAgainPref, setDontShowAgainPref] = useState(() => localStorage.getItem('hideTrashModal') === 'true');
-  const [tempDontShowAgain, setTempDontShowAgain] = useState(false);
   
   // Basic column widths state
   const [colWidths, setColWidths] = useState({
@@ -84,22 +81,9 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
   };
 
   const handleTrashClick = () => {
-    if (dontShowAgainPref) {
-      confirmTrash();
-    } else {
-      setShowTrashModal(true);
-    }
-  };
-
-  const confirmTrash = () => {
-    if (tempDontShowAgain) {
-      localStorage.setItem('hideTrashModal', 'true');
-      setDontShowAgainPref(true);
-    }
     const pathsToMove = results.filter(r => selectedIds.has(r.id)).map(r => r.path);
     onTrash(pathsToMove);
     setSelectedIds(new Set());
-    setShowTrashModal(false);
   };
 
   const getStatusBadge = (status: AudioRecord['status']) => {
@@ -222,14 +206,14 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
                               )}
                             </div>
                           </div>
-
+ 
                           <div className="report-section" style={{ flex: 2 }}>
                             <span className="section-label">[ QUALITY_SUMMARY ]</span>
                             <div className="report-text">
                               {r.review || "NO_METRICS_AVAILABLE_FOR_THIS_STREAM"}
                             </div>
                           </div>
-
+ 
                           <div className="report-section action-section">
                             <span className="section-label">[ DIAGNOSTICS ]</span>
                             <button 
@@ -254,36 +238,6 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
         </tbody>
         </table>
       </div>
-
-      {/* Trash Warning Modal */}
-      {showTrashModal && (
-        <div className="modal-overlay" onClick={() => setShowTrashModal(false)}>
-          <div className="modal-content trash-modal" onClick={e => e.stopPropagation()}>
-            <ShieldAlert size={48} color="var(--status-inflated)" style={{ marginBottom: '1rem' }} />
-            <h2 style={{ color: '#fff', marginBottom: '1rem' }}>Move to Trash?</h2>
-            <div className="trash-info-box">
-              <p><strong>IMPORTANT:</strong> Music Analyzer <strong>NEVER</strong> deletes your files.</p>
-              <p>The selected files will be moved to a <code>/trash</code> folder inside the project directory.</p>
-              <p>You must manually empty that folder if you wish to permanently delete the files.</p>
-            </div>
-            
-            <label className="dont-show-again">
-              <input 
-                type="checkbox" 
-                checked={tempDontShowAgain}
-                onChange={(e) => setTempDontShowAgain(e.target.checked)}
-                className="custom-checkbox"
-              />
-              Don't show this message again
-            </label>
-
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', width: '100%' }}>
-              <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setShowTrashModal(false)}>Cancel</button>
-              <button className="btn-danger" style={{ flex: 1 }} onClick={confirmTrash}>Move to TRASH</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, FolderSearch, BarChart2, FileAudio, X, Search } from 'lucide-react';
+import { Activity, FolderSearch, BarChart2, FileAudio, X, Search, ShieldAlert } from 'lucide-react';
 import './index.css';
 import { TableView } from './views/TableView';
 import { ExplorerView } from './views/ExplorerView';
@@ -33,6 +33,12 @@ function App() {
   const [showFolderBrowser, setShowFolderBrowser] = useState(false);
   const [spectrogramFile, setSpectrogramFile] = useState<AudioRecord | null>(null);
   const [isImgLoading, setIsImgLoading] = useState(true);
+
+  // Trash Modal States
+  const [showTrashModal, setShowTrashModal] = useState(false);
+  const [trashPaths, setTrashPaths] = useState<string[]>([]);
+  const [dontShowTrashAgain, setDontShowTrashAgain] = useState(() => localStorage.getItem('hideTrashModal') === 'true');
+  const [tempDontShowAgain, setTempDontShowAgain] = useState(false);
 
   // System Health States
   const [serverStatus, setServerStatus] = useState<'checking' | 'error' | 'ready'>('checking');
@@ -119,6 +125,25 @@ function App() {
       console.error('Error trashing files:', err);
       setStatusMsg('Error moving files to TRASH');
     }
+  };
+
+  const triggerTrash = (paths: string[]) => {
+    if (dontShowTrashAgain) {
+      handleTrash(paths);
+    } else {
+      setTrashPaths(paths);
+      setShowTrashModal(true);
+    }
+  };
+
+  const confirmTrashFromModal = () => {
+    if (tempDontShowAgain) {
+      localStorage.setItem('hideTrashModal', 'true');
+      setDontShowTrashAgain(true);
+    }
+    handleTrash(trashPaths);
+    setTrashPaths([]);
+    setShowTrashModal(false);
   };
 
   if (serverStatus !== 'ready' || !ffmpegStatus) {
@@ -252,7 +277,7 @@ function App() {
             expandedId={expandedId} 
             toggleExpand={toggleExpand} 
             onAnalyze={(r: AudioRecord) => setSpectrogramFile(r)} 
-            onTrash={handleTrash}
+            onTrash={triggerTrash}
           />
         </div>
       )}
@@ -291,6 +316,35 @@ function App() {
               <button className="btn-secondary" onClick={() => setSpectrogramFile(null)}>
                 TERMINATE_VIEW
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Trash Warning Modal */}
+      {showTrashModal && (
+        <div className="modal-overlay" onClick={() => setShowTrashModal(false)}>
+          <div className="modal-content trash-modal" onClick={e => e.stopPropagation()}>
+            <ShieldAlert size={48} color="var(--status-inflated)" style={{ marginBottom: '1rem' }} />
+            <h2 style={{ color: '#fff', marginBottom: '1rem' }}>Move to Trash?</h2>
+            <div className="trash-info-box">
+              <p><strong>IMPORTANT:</strong> Music Analyzer <strong>NEVER</strong> deletes your files.</p>
+              <p>The selected files will be moved to a <code>/trash</code> folder inside the project directory.</p>
+              <p>You must manually empty that folder if you wish to permanently delete the files.</p>
+            </div>
+            
+            <label className="dont-show-again">
+              <input 
+                type="checkbox" 
+                checked={tempDontShowAgain}
+                onChange={(e) => setTempDontShowAgain(e.target.checked)}
+                className="custom-checkbox"
+              />
+              Don't show this message again
+            </label>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', width: '100%' }}>
+              <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setShowTrashModal(false)}>Cancel</button>
+              <button className="btn-danger" style={{ flex: 1 }} onClick={confirmTrashFromModal}>Move to TRASH</button>
             </div>
           </div>
         </div>
