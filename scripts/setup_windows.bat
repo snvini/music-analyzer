@@ -62,9 +62,9 @@ if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
 if exist "%ROOT_DIR%\bin\ffmpeg\ffmpeg.exe" goto :local_ffmpeg_found
 
 echo FFmpeg not found. Downloading Lightweight version (~60MB)...
-:: Usando links DIRETOS de download do ffbinaries para evitar corrupção
-curl -L --progress-bar "https://ffbinaries.com/api/v1/download/latest/ffmpeg/windows-64" -o "%ROOT_DIR%\bin\ffmpeg_temp.zip"
-curl -L --progress-bar "https://ffbinaries.com/api/v1/download/latest/ffprobe/windows-64" -o "%ROOT_DIR%\bin\ffprobe_temp.zip"
+:: Usando links DIRETOS do repositório do GitHub (Alta velocidade e confiável)
+curl -L --progress-bar "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffmpeg-6.1-win-64.zip" -o "%ROOT_DIR%\bin\ffmpeg_temp.zip"
+curl -L --progress-bar "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffprobe-6.1-win-64.zip" -o "%ROOT_DIR%\bin\ffprobe_temp.zip"
 
 if %errorlevel% neq 0 (
     echo [ERROR] FFmpeg download failed. Please check your internet.
