@@ -62,6 +62,16 @@ If macOS says the file "could not be executed because you do not have appropriat
 
 ---
 
+## 📦 Portabilidade e Espaço / Portability & Size
+
+> [!TIP]
+> **Zero Instalação / Zero Installation**:
+> - **Tamanho Final**: Após a configuração completa, o programa ocupa cerca de **530MB**.
+> - **100% Portátil**: O Music Analyzer **não instala nada** no seu sistema operacional. Todos os componentes (Node.js, FFmpeg e dependências) ficam guardados exclusivamente dentro da pasta do projeto. Para remover o programa, basta deletar a pasta.
+>
+> - **Final Size**: After full setup, the application occupies approximately **530MB**.
+> - **100% Portable**: Music Analyzer **does not install anything** on your operating system. All components (Node.js, FFmpeg, and dependencies) are stored exclusively within the project folder. To remove the program, simply delete the folder.
+
 ---
 
 ## 📂 Folder Structure
