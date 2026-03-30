@@ -13,9 +13,29 @@ A high-fidelity, professional-grade audio toolkit designed for DJs to recursivel
 
 ---
 
-## 🚀 Quick Start (Recommended)
+## 🚀 Quick Installation (One-Liner)
 
-This project is designed for **Zero-Configuration**. You don't need to open the terminal or install things manually.
+The fastest way to install **Music Analyzer** on your Desktop without needing `git` or manual downloads. 
+
+### macOS 🍎 (Terminal) - Recommended
+> [!IMPORTANT]
+> **This is the preferred method for Mac users.** It bypasses "Permission Denied" and "Gatekeeper" blocks automatically.
+> 
+Copy and paste this into your Terminal:
+```bash
+curl -sSL https://raw.githubusercontent.com/snvini/music-analyzer/main/install.sh | bash
+```
+
+### Windows 🪟 (PowerShell)
+Copy and paste this into your PowerShell:
+```powershell
+iwr -useb https://raw.githubusercontent.com/snvini/music-analyzer/main/install.ps1 | iex
+```
+
+---
+
+## 🚀 Manual Quick Start
+If you prefer to download the files manually:
 
 ### Windows 🪟
 1.  Download or Clone the repository.
@@ -24,13 +44,10 @@ This project is designed for **Zero-Configuration**. You don't need to open the 
 
 ### macOS 🍎
 1.  Download or Clone the repository.
-2.  Double-click **`START_ANALYZER_MAC.command`**.
+2.  Double-click **`START_ANALYZER_MACLINUX.command`**.
 3.  If you see an error about **"Access Privileges"** or **"Permission Denied"**:
-    - Right-click the file and select **Open**. 
-    - OR follow the [Fix Permissions](#-mac-troubleshooting) guide below.
-
-> [!TIP]
-> **MAC TIP (Zero Terminal)**: The easiest way to avoid permission issues on Mac is to download the project using [GitHub Desktop](https://desktop.github.com/). It handles all file permissions automatically, so you can just double-click to start!
+    - **Recommended Solution**: Use the [One-Liner Terminal Installation](#-quick-installation-one-liner) above.
+    - **Alternative**: Right-click the file and select **Open**, or follow the [Fix Permissions](#-mac-troubleshooting) guide below.
 
 ---
 
@@ -44,14 +61,6 @@ If macOS says the file "could not be executed because you do not have appropriat
 5.  Now you can double-click the file normally! 🎉
 
 ---
-
-## 🛠️ Prerequisites
-The system will attempt to install these for you, but it's best to have them:
-- **Node.js (LTS)**: [Download here](https://nodejs.org/)
-- **FFmpeg**: The setup will download a portable version automatically.
-
-> [!NOTE]
-> **First Run**: The first time you open the app, it will download about 100MB of essential tools and dependencies. This only happens once!
 
 ---
 
