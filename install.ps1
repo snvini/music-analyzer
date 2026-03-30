@@ -64,10 +64,19 @@ if (Test-Path $GITHUB_FOLDER_NAME) {
 Remove-Item $ZIP_FILE -Force
 
 # 4. Feedback visual de sucesso
-Write-Host "✅ [3/4] [PT] Instalação concluída! / [EN] Installation finished!" -ForegroundColor Green
+Write-Host "`n✅ [3/4] [PT] Instalação concluída! / [EN] Installation finished!" -ForegroundColor Green
 Write-Host "---------------------------------------------------"
 Write-Host "📂 [PT] Salvo em: $INSTALL_DIR\$FOLDER_NAME"
 Write-Host "📂 [EN] Saved at: $INSTALL_DIR\$FOLDER_NAME"
-Write-Host "💡 [PT] Para começar, execute: START_ANALYZER_WINDOWS.bat"
-Write-Host "💡 [EN] To start, run: START_ANALYZER_WINDOWS.bat"
+Write-Host "💡 [PT] Para começar, entre na pasta e execute: START_ANALYZER_WINDOWS.bat"
+Write-Host "💡 [EN] To start, enter the folder and run: START_ANALYZER_WINDOWS.bat"
 Write-Host "---------------------------------------------------"
+
+# Tenta abrir a pasta automaticamente para facilitar a vida do usuário
+try {
+    explorer.exe "$INSTALL_DIR\$FOLDER_NAME"
+} catch {}
+
+Write-Host "`n🚀 [PT] O sistema abrirá o instalador completo na primeira execução." -ForegroundColor Cyan
+Write-Host "🚀 [EN] The system will open the full installer on first run." -ForegroundColor Cyan
+timeout /t 10

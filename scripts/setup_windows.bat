@@ -59,10 +59,17 @@ goto :ffmpeg_ready
 :check_local_ffmpeg
 if not exist "%ROOT_DIR%\bin" mkdir "%ROOT_DIR%\bin"
 if exist "%ROOT_DIR%\bin\ffmpeg.exe" goto :local_ffmpeg_found
-echo FFmpeg not found. Downloading portable version (This may take a moment)...
-curl -L --progress-bar "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -o "%ROOT_DIR%\bin\ffmpeg.zip"
+echo FFmpeg not found. Downloading Mini-Essentials version (~25MB)...
+:: Using Gyan.dev Essentials Release - Significantly smaller and more stable than "master"
+curl -L --progress-bar "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip" -o "%ROOT_DIR%\bin\ffmpeg.zip"
 if %errorlevel% neq 0 (
     echo [ERROR] FFmpeg download failed.
+    echo Trying fallback source...
+    curl -L --progress-bar "https://github.com/GyanD/codexffmpeg/releases/download/7.1/ffmpeg-7.1-essentials_build.zip" -o "%ROOT_DIR%\bin\ffmpeg.zip"
+)
+
+if not exist "%ROOT_DIR%\bin\ffmpeg.zip" (
+    echo [ERROR] Could not download FFmpeg. Please check your internet.
     pause
     exit /b 1
 )

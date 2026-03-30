@@ -63,23 +63,27 @@ if ! command -v ffmpeg &> /dev/null; then
     if [ -f "$ROOT_DIR/bin/ffmpeg/ffmpeg" ]; then
         FFMPEG_BINARY="$ROOT_DIR/bin/ffmpeg/ffmpeg"
     else
-        echo "FFmpeg not found. Downloading portable version..."
+        echo "FFmpeg not found. Downloading Mini-Portable version (~20MB)..."
         mkdir -p "$ROOT_DIR/bin"
-        # Download static build from evermeet.cx (standard for macOS)
-        curl -L --progress-bar "https://evermeet.cx/ffmpeg/getrelease/zip" -o "$ROOT_DIR/bin/ffmpeg.zip"
-        echo "Extracting FFmpeg..."
-        unzip -o "$ROOT_DIR/bin/ffmpeg.zip" -d "$ROOT_DIR/bin/"
+        
+        # Using ffbinaries CDN - Fast and Lightweight
+        # Download FFmpeg
+        curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffmpeg&os=macos-64" -o "$ROOT_DIR/bin/ffmpeg.zip"
+        # Download FFprobe
+        curl -L --progress-bar "https://ffbinaries.com/api/v1/get?components=ffprobe&os=macos-64" -o "$ROOT_DIR/bin/ffprobe.zip"
+        
+        echo "Extracting FFmpeg & FFprobe..."
+        mkdir -p "$ROOT_DIR/bin/ffmpeg"
+        unzip -o "$ROOT_DIR/bin/ffmpeg.zip" -d "$ROOT_DIR/bin/ffmpeg/"
+        unzip -o "$ROOT_DIR/bin/ffprobe.zip" -d "$ROOT_DIR/bin/ffmpeg/"
+        
+        # Add execution permissions
+        chmod +x "$ROOT_DIR/bin/ffmpeg/ffmpeg"
+        chmod +x "$ROOT_DIR/bin/ffmpeg/ffprobe"
+        
         rm "$ROOT_DIR/bin/ffmpeg.zip"
-        # Some zips might extract as a single file, others in a folder. We'll handle both.
-        if [ -f "$ROOT_DIR/bin/ffmpeg" ]; then
-             mkdir -p "$ROOT_DIR/bin/ffmpeg_folder"
-             mv "$ROOT_DIR/bin/ffmpeg" "$ROOT_DIR/bin/ffmpeg_folder/ffmpeg"
-             # Also try to get ffprobe which is in a separate zip usually
-             curl -L "https://evermeet.cx/ffprobe/getrelease/zip" -o "$ROOT_DIR/bin/ffprobe.zip"
-             unzip -o "$ROOT_DIR/bin/ffprobe.zip" -d "$ROOT_DIR/bin/ffmpeg_folder/"
-             rm "$ROOT_DIR/bin/ffprobe.zip"
-             mv "$ROOT_DIR/bin/ffmpeg_folder" "$ROOT_DIR/bin/ffmpeg"
-        fi
+        rm "$ROOT_DIR/bin/ffprobe.zip"
+        
         FFMPEG_BINARY="$ROOT_DIR/bin/ffmpeg/ffmpeg"
     fi
 fi
