@@ -17,7 +17,7 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
   
   // Basic column widths state
   const [colWidths, setColWidths] = useState({
-    select: 40, status: 100, filename: 250, folder: 300, codec: 80, sampleRate: 100, bitrate: 120
+    select: 40, status: 100, filename: 250, folder: 300, codec: 80, sampleRate: 100, bitrate: 120, expand: 36
   });
 
   const handleDrag = (e: React.MouseEvent, col: keyof typeof colWidths) => {
@@ -142,12 +142,14 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
                 </div>
               </th>
             ))}
+            {/* Expand chevron column - no header text */}
+            <th style={{ width: colWidths.expand }} />
           </tr>
         </thead>
         <tbody>
           {sorted.length === 0 ? (
             <tr>
-              <td colSpan={7} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+              <td colSpan={8} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                 No results to display
               </td>
             </tr>
@@ -176,18 +178,20 @@ export function TableView({ results, filter, expandedId, toggleExpand, onAnalyze
                   <span className="codec-badge">{r.codec}</span>
                 </td>
                 <td style={{ width: colWidths.sampleRate, overflow: 'hidden' }} className="text-muted tabular-nums">
-                  {Math.round(parseInt(r.sampleRate)/100)/10 || '?'}k
+                  {r.sampleRate || '?'}
                 </td>
-                <td style={{ width: colWidths.bitrate, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} className="text-muted font-mono">
+                <td style={{ width: colWidths.bitrate, overflow: 'hidden' }} className="text-muted font-mono">
                   <span>{r.bitrate}</span>
+                </td>
+                <td style={{ width: colWidths.expand, textAlign: 'center', verticalAlign: 'middle' }}>
                   {expandedId === r.id ? <ChevronUp size={16} className="text-muted" /> : <ChevronDown size={16} className="text-muted" />}
                 </td>
               </tr>
               
               {/* Expandable Details Row */}
               {expandedId === r.id && (
-                <tr className="details-row">
-                  <td colSpan={7}>
+                <tr className="details-row" onClick={(e) => e.stopPropagation()}>
+                  <td colSpan={8}>
                     <div className="details-overflow-fix">
                       <div className="report-container">
                         <div className="report-header">
