@@ -68,8 +68,10 @@ if ! command -v ffmpeg &> /dev/null; then
         
         # Using Direct Download URLs from GitHub Releases (Reliable & Fast)
         # Download FFmpeg
+        echo "[1/2] Downloading FFmpeg (Analysis Engine)..."
         curl -L --progress-bar "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffmpeg-6.1-macos-64.zip" -o "$ROOT_DIR/bin/ffmpeg.zip"
         # Download FFprobe
+        echo "[2/2] Downloading FFprobe (Metadata Scanner)..."
         curl -L --progress-bar "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffprobe-6.1-macos-64.zip" -o "$ROOT_DIR/bin/ffprobe.zip"
         
         echo "Extracting FFmpeg & FFprobe..."

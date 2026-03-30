@@ -63,7 +63,10 @@ if exist "%ROOT_DIR%\bin\ffmpeg\ffmpeg.exe" goto :local_ffmpeg_found
 
 echo FFmpeg not found. Downloading Lightweight version (~60MB)...
 :: Usando links DIRETOS do repositório do GitHub (Alta velocidade e confiável)
+echo [1/2] Downloading FFmpeg (Analysis Engine)...
 curl -L --progress-bar "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffmpeg-6.1-win-64.zip" -o "%ROOT_DIR%\bin\ffmpeg_temp.zip"
+
+echo [2/2] Downloading FFprobe (Metadata Scanner)...
 curl -L --progress-bar "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffprobe-6.1-win-64.zip" -o "%ROOT_DIR%\bin\ffprobe_temp.zip"
 
 if %errorlevel% neq 0 (

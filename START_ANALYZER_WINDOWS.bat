@@ -28,10 +28,15 @@ if not exist "node_modules" goto :setup
 if not exist "backend\node_modules" goto :setup
 if not exist "frontend\node_modules" goto :setup
 
-:: Check for FFmpeg (either system-wide or in bin\)
+:: Add portable FFmpeg to PATH if it exists locally
+if exist "bin\ffmpeg\ffmpeg.exe" (
+    set "PATH=%CD%\bin\ffmpeg;%PATH%"
+)
+
+:: Check for FFmpeg (either system-wide or in bin\ffmpeg)
 ffmpeg -version >nul 2>&1
 if %errorlevel% neq 0 (
-    if not exist "bin\ffmpeg.exe" goto :setup
+    if not exist "bin\ffmpeg\ffmpeg.exe" goto :setup
 )
 
 goto :launch
