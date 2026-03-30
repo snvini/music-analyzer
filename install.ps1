@@ -8,8 +8,15 @@ $FOLDER_NAME = "Music-Analyzer"
 $ZIP_FILE = "music_temp.zip"
 $GITHUB_FOLDER_NAME = "music-analyzer-main"
 
-# 1. Definir o local de instalação (Mesa/Desktop)
-$INSTALL_DIR = "$HOME\Desktop"
+# 1. Definir o local de instalação de forma DINÂMICA (Desktop/Área de Trabalho/etc)
+# Uses the system's official 'Desktop' folder path regardless of its name
+try {
+    $INSTALL_DIR = [Environment]::GetFolderPath("Desktop")
+    if (-not $INSTALL_DIR) { throw }
+} catch {
+    $INSTALL_DIR = Join-Path $HOME "Desktop"
+}
+
 Set-Location $INSTALL_DIR
 
 Write-Host "---------------------------------------------------" -ForegroundColor Cyan

@@ -10,8 +10,15 @@ FOLDER_NAME="Music-Analyzer"
 ZIP_FILE="music_temp.zip"
 GITHUB_FOLDER_NAME="music-analyzer-main"
 
-# 1. Definir o local de instalação (Mesa/Desktop)
-INSTALL_DIR="$HOME/Desktop"
+# 1. Definir o local de instalação de forma DINÂMICA (Desktop/Área de Trabalho/etc)
+# Tenta pegar via AppleScript (mais preciso no Mac) ou fallback para ~/Desktop
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    INSTALL_DIR=$(osascript -e 'POSIX path of (path to desktop folder)' 2>/dev/null || echo "$HOME/Desktop")
+else
+    # Fallback para Linux ou se osascript falhar
+    INSTALL_DIR="$HOME/Desktop"
+fi
+
 cd "$INSTALL_DIR" || exit
 
 echo "---------------------------------------------------"
